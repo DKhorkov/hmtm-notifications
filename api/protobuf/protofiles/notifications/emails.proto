@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+
+package emails;
+
+option go_package = "github.com/DKhorkov/hmtm-emails/api/protobuf/notifications;notifications";
+
+
+service EmailsService {
+  rpc GetUserEmailCommunications(GetUserEmailCommunicationsIn) returns (GetUserEmailCommunicationsOut) {}
+}
+
+message GetUserEmailCommunicationsIn {
+  uint64 userID = 1;
+}
+
+message Email {
+  uint64 ID = 1;
+  uint64 userID = 2;
+  string email = 3;
+  string content = 4;
+  google.protobuf.Timestamp sentAt = 5;
+}
+
+message GetUserEmailCommunicationsOut {
+  repeated Email emails = 1;
+}

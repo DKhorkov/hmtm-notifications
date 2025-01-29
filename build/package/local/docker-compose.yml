@@ -1,0 +1,21 @@
+version: '3'
+
+services:
+  hmtm_notifications_database:
+    container_name: hmtm_notifications_database
+    hostname: hmtm_notifications_database
+    image: postgres
+    restart: always
+    env_file:
+      - ../../../.env
+    volumes:
+      - ../../../postgres_data:/var/lib/postgresql/data
+      - ../../../postgres_backups:/backups
+      - ../../../scripts/postgres:/scripts
+    ports:
+      - "${HMTM_NOTIFICATIONS_DB_OUTER_PORT}:${HMTM_NOTIFICATIONS_DB_INNER_PORT}"
+    networks:
+      - hmtm_network
+
+networks:
+  hmtm_network:
