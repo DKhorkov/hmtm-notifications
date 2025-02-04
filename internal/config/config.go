@@ -42,12 +42,21 @@ func New() Config {
 		},
 		Logging: logging.Config{
 			Level:       logging.Levels.DEBUG,
-			LogFilePath: fmt.Sprintf("logs/%s.log", time.Now().Format("02-01-2006")),
+			LogFilePath: fmt.Sprintf("logs/%s.log", time.Now().UTC().Format("02-01-2006")),
 		},
-		Clients: ClientsConfig{},
+		Clients: ClientsConfig{
+			SSO: ClientConfig{
+				Host:         loadenv.GetEnv("SSO_CLIENT_HOST", "0.0.0.0"),
+				Port:         loadenv.GetEnvAsInt("SSO_CLIENT_PORT", 8070),
+				RetriesCount: loadenv.GetEnvAsInt("SSO_RETRIES_COUNT", 3),
+				RetryTimeout: time.Second * time.Duration(
+					loadenv.GetEnvAsInt("SSO_RETRIES_TIMEOUT", 1),
+				),
+			},
+		},
 		Tracing: TracingConfig{
 			Server: tracing.Config{
-				ServiceName:    loadenv.GetEnv("TRACING_SERVICE_NAME", "hmtm-emails"),
+				ServiceName:    loadenv.GetEnv("TRACING_SERVICE_NAME", "hmtm-notifications"),
 				ServiceVersion: loadenv.GetEnv("VERSION", "latest"),
 				JaegerURL: fmt.Sprintf(
 					"http://%s:%d/api/traces",
@@ -82,7 +91,7 @@ func New() Config {
 					},
 				},
 				Repositories: SpanRepositories{
-					Notifications: tracing.SpanConfig{
+					Emails: tracing.SpanConfig{
 						Opts: []trace.SpanStartOption{
 							trace.WithAttributes(
 								attribute.String("Environment", loadenv.GetEnv("ENVIRONMENT", "local")),
@@ -108,8 +117,111 @@ func New() Config {
 						},
 					},
 				},
-				Clients: SpanClients{},
+				Clients: SpanClients{
+					SSO: tracing.SpanConfig{
+						Opts: []trace.SpanStartOption{
+							trace.WithAttributes(
+								attribute.String("Environment", loadenv.GetEnv("ENVIRONMENT", "local")),
+							),
+						},
+						Events: tracing.SpanEventsConfig{
+							Start: tracing.SpanEventConfig{
+								Name: "Calling gRPC SSO client",
+								Opts: []trace.EventOption{
+									trace.WithAttributes(
+										attribute.String("Environment", loadenv.GetEnv("ENVIRONMENT", "local")),
+									),
+								},
+							},
+							End: tracing.SpanEventConfig{
+								Name: "Received response from gRPC SSO client",
+								Opts: []trace.EventOption{
+									trace.WithAttributes(
+										attribute.String("Environment", loadenv.GetEnv("ENVIRONMENT", "local")),
+									),
+								},
+							},
+						},
+					},
+				},
+				Handlers: SpanHandlers{
+					VerifyEmail: tracing.SpanConfig{
+						Opts: []trace.SpanStartOption{
+							trace.WithAttributes(
+								attribute.String("Environment", loadenv.GetEnv("ENVIRONMENT", "local")),
+							),
+						},
+						Events: tracing.SpanEventsConfig{
+							Start: tracing.SpanEventConfig{
+								Name: "Calling verify email worker handler",
+								Opts: []trace.EventOption{
+									trace.WithAttributes(
+										attribute.String("Environment", loadenv.GetEnv("ENVIRONMENT", "local")),
+									),
+								},
+							},
+							End: tracing.SpanEventConfig{
+								Name: "Received response from verify email worker handler",
+								Opts: []trace.EventOption{
+									trace.WithAttributes(
+										attribute.String("Environment", loadenv.GetEnv("ENVIRONMENT", "local")),
+									),
+								},
+							},
+						},
+					},
+				},
+				Senders: SpanSenders{
+					Email: tracing.SpanConfig{
+						Opts: []trace.SpanStartOption{
+							trace.WithAttributes(
+								attribute.String("Environment", loadenv.GetEnv("ENVIRONMENT", "local")),
+							),
+						},
+						Events: tracing.SpanEventsConfig{
+							Start: tracing.SpanEventConfig{
+								Name: "Sending email",
+								Opts: []trace.EventOption{
+									trace.WithAttributes(
+										attribute.String("Environment", loadenv.GetEnv("ENVIRONMENT", "local")),
+									),
+								},
+							},
+							End: tracing.SpanEventConfig{
+								Name: "Sent email",
+								Opts: []trace.EventOption{
+									trace.WithAttributes(
+										attribute.String("Environment", loadenv.GetEnv("ENVIRONMENT", "local")),
+									),
+								},
+							},
+						},
+					},
+				},
 			},
+		},
+		NATS: NATSConfig{
+			MessageChannelBufferSize: loadenv.GetEnvAsInt("NATS_MESSAGE_CHANNEL_BUFFER_SIZE", 1),
+			GoroutinesPoolSize:       loadenv.GetEnvAsInt("NATS_GOROUTINES_POOL_SIZE", 1),
+			ClientURL: fmt.Sprintf(
+				"nats://%s:%d",
+				loadenv.GetEnv("NATS_HOST", "0.0.0.0"),
+				loadenv.GetEnvAsInt("NATS_CLIENT_PORT", 4222),
+			),
+			Subjects: NATSSubjects{
+				VerifyEmail: loadenv.GetEnv("NATS_VERIFY_EMAIL_SUBJECT", "verify-email"),
+			},
+			Workers: NATSWorkers{
+				VerifyEmail: NATSWorker{
+					Name: loadenv.GetEnv("NATS_VERIFY_EMAIL_WORKER_NAME", "verify-email-worker"),
+				},
+			},
+		},
+		EmailSMTP: EmailSMTPConfig{
+			Host:     loadenv.GetEnv("EMAIL_SMTP_HOST", "smtp.freesmtpservers.com"),
+			Port:     loadenv.GetEnvAsInt("EMAIL_SMTP_PORT", 25),
+			Login:    loadenv.GetEnv("EMAIL_SMTP_LOGIN", "smtp"),
+			Password: loadenv.GetEnv("EMAIL_SMTP_PASSWORD", "smtp"),
 		},
 	}
 }
@@ -121,7 +233,9 @@ type ClientConfig struct {
 	RetriesCount int
 }
 
-type ClientsConfig struct{}
+type ClientsConfig struct {
+	SSO ClientConfig
+}
 
 type HTTPConfig struct {
 	Host string
@@ -137,13 +251,52 @@ type SpansConfig struct {
 	Root         tracing.SpanConfig
 	Repositories SpanRepositories
 	Clients      SpanClients
+	Handlers     SpanHandlers
+	Senders      SpanSenders
+}
+
+type SpanHandlers struct {
+	VerifyEmail tracing.SpanConfig
+}
+
+type SpanSenders struct {
+	Email tracing.SpanConfig
 }
 
 type SpanRepositories struct {
-	Notifications tracing.SpanConfig
+	Emails tracing.SpanConfig
 }
 
-type SpanClients struct{}
+type SpanClients struct {
+	SSO tracing.SpanConfig
+}
+
+type NATSConfig struct {
+	ClientURL                string
+	MessageChannelBufferSize int
+	GoroutinesPoolSize       int
+	Subjects                 NATSSubjects
+	Workers                  NATSWorkers
+}
+
+type NATSSubjects struct {
+	VerifyEmail string
+}
+
+type NATSWorkers struct {
+	VerifyEmail NATSWorker
+}
+
+type NATSWorker struct {
+	Name string
+}
+
+type EmailSMTPConfig struct {
+	Host     string
+	Port     int
+	Login    string
+	Password string
+}
 
 type Config struct {
 	HTTP        HTTPConfig
@@ -153,4 +306,6 @@ type Config struct {
 	Tracing     TracingConfig
 	Environment string
 	Version     string
+	NATS        NATSConfig
+	EmailSMTP   EmailSMTPConfig
 }

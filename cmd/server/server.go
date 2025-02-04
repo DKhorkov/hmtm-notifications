@@ -2,15 +2,25 @@ package main
 
 import (
 	"context"
+	"fmt"
+
+	"github.com/DKhorkov/hmtm-notifications/internal/contentbuilders"
+	"github.com/DKhorkov/hmtm-notifications/internal/interfaces"
+
+	"github.com/nats-io/nats.go"
 
 	"github.com/DKhorkov/hmtm-notifications/internal/app"
+	ssogrpcclient "github.com/DKhorkov/hmtm-notifications/internal/clients/sso/grpc"
 	"github.com/DKhorkov/hmtm-notifications/internal/config"
 	grpccontroller "github.com/DKhorkov/hmtm-notifications/internal/controllers/grpc"
 	"github.com/DKhorkov/hmtm-notifications/internal/repositories"
+	"github.com/DKhorkov/hmtm-notifications/internal/senders"
 	"github.com/DKhorkov/hmtm-notifications/internal/services"
 	"github.com/DKhorkov/hmtm-notifications/internal/usecases"
+	"github.com/DKhorkov/hmtm-notifications/internal/workers/handlers/builders"
 	"github.com/DKhorkov/libs/db"
 	"github.com/DKhorkov/libs/logging"
+	customnats "github.com/DKhorkov/libs/nats"
 	"github.com/DKhorkov/libs/tracing"
 )
 
@@ -52,11 +62,31 @@ func main() {
 		}
 	}()
 
+	ssoClient, err := ssogrpcclient.New(
+		settings.Clients.SSO.Host,
+		settings.Clients.SSO.Port,
+		settings.Clients.SSO.RetriesCount,
+		settings.Clients.SSO.RetryTimeout,
+		logger,
+		traceProvider,
+		settings.Tracing.Spans.Clients.SSO,
+	)
+
+	if err != nil {
+		panic(err)
+	}
+
+	ssoRepository := repositories.NewGrpcSsoRepository(ssoClient)
+	ssoService := services.NewCommonSsoService(
+		ssoRepository,
+		logger,
+	)
+
 	emailsRepository := repositories.NewCommonEmailsRepository(
 		dbConnector,
 		logger,
 		traceProvider,
-		settings.Tracing.Spans.Repositories.Notifications,
+		settings.Tracing.Spans.Repositories.Emails,
 	)
 
 	emailsService := services.NewCommonEmailsService(
@@ -64,7 +94,25 @@ func main() {
 		logger,
 	)
 
-	useCases := usecases.NewCommonUseCases(emailsService)
+	contentBuilders := interfaces.ContentBuilders{
+		Email: contentbuilders.NewCommonEmailContentBuilder(),
+	}
+
+	communicationsSenders := interfaces.Senders{
+		Email: senders.NewEmailSender(
+			settings.EmailSMTP,
+			traceProvider,
+			settings.Tracing.Spans.Senders.Email,
+		),
+	}
+
+	useCases := usecases.NewCommonUseCases(
+		emailsService,
+		ssoService,
+		contentBuilders,
+		communicationsSenders,
+	)
+
 	controller := grpccontroller.New(
 		settings.HTTP.Host,
 		settings.HTTP.Port,
@@ -73,6 +121,40 @@ func main() {
 		traceProvider,
 		settings.Tracing.Spans.Root,
 	)
+
+	verifyEmailWorker, err := customnats.NewCommonWorker(
+		settings.NATS.ClientURL,
+		settings.NATS.Subjects.VerifyEmail,
+		customnats.WithGoroutinesPoolSize(settings.NATS.GoroutinesPoolSize),
+		customnats.WithMessageChannelBufferSize(settings.NATS.MessageChannelBufferSize),
+		customnats.WithNatsOptions(nats.Name(settings.NATS.Workers.VerifyEmail.Name)),
+		customnats.WithMessageHandler(
+			builders.NewVerifyEmailBuilder(
+				useCases,
+				traceProvider,
+				settings.Tracing.Spans.Handlers.VerifyEmail,
+				logger,
+			).NewVerifyEmailMessageHandler(),
+		),
+	)
+
+	if err != nil {
+		panic(err)
+	}
+
+	if err = verifyEmailWorker.Run(); err != nil {
+		panic(err)
+	}
+
+	defer func() {
+		if err = verifyEmailWorker.Stop(); err != nil {
+			logging.LogError(
+				logger,
+				fmt.Sprintf("Error shutting down \"%s\" worker", settings.NATS.Workers.VerifyEmail.Name),
+				err,
+			)
+		}
+	}()
 
 	application := app.New(controller)
 	application.Run()

@@ -32,5 +32,19 @@ services:
     networks:
       - hmtm_network
 
+  nats:
+    image: nats:alpine
+    container_name: nats
+    restart: always
+    command: -c /etc/nats/nats.conf
+    ports:
+      - "${NATS_OUTER_CLIENT_PORT}:${NATS_INNER_CLIENT_PORT}"
+      - "${NATS_OUTER_CLUSTER_PORT}:${NATS_INNER_CLUSTER_PORT}"
+      - "${NATS_OUTER_WEB_PORT}:${NATS_INNER_WEB_PORT}"
+    volumes:
+      - ../../../nats.conf:/etc/nats/nats.conf
+    networks:
+      - hmtm_network
+
 networks:
   hmtm_network:
