@@ -37,7 +37,7 @@ type VerifyEmailBuilder struct {
 	logger        *slog.Logger
 }
 
-func (b *VerifyEmailBuilder) NewVerifyEmailMessageHandler() handlers.MessageHandler {
+func (b *VerifyEmailBuilder) MessageHandler() handlers.MessageHandler {
 	return func(message *nats.Msg) {
 		ctx, span := b.traceProvider.Span(context.Background(), tracing.CallerName(tracing.DefaultSkipLevel))
 		defer span.End()

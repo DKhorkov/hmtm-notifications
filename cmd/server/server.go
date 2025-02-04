@@ -134,7 +134,7 @@ func main() {
 				traceProvider,
 				settings.Tracing.Spans.Handlers.VerifyEmail,
 				logger,
-			).NewVerifyEmailMessageHandler(),
+			).MessageHandler(),
 		),
 	)
 
