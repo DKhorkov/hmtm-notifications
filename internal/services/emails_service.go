@@ -5,7 +5,6 @@ import (
 	"log/slog"
 
 	"github.com/DKhorkov/hmtm-notifications/internal/entities"
-
 	"github.com/DKhorkov/hmtm-notifications/internal/interfaces"
 )
 
@@ -24,9 +23,13 @@ type CommonEmailsService struct {
 	logger           *slog.Logger
 }
 
-func (service *CommonEmailsService) GetUserEmailCommunications(
+func (service *CommonEmailsService) GetUserCommunications(
 	ctx context.Context,
 	userID uint64,
 ) ([]entities.Email, error) {
-	return service.emailsRepository.GetUserEmailCommunications(ctx, userID)
+	return service.emailsRepository.GetUserCommunications(ctx, userID)
+}
+
+func (service *CommonEmailsService) SaveCommunication(ctx context.Context, email entities.Email) (uint64, error) {
+	return service.emailsRepository.SaveCommunication(ctx, email)
 }

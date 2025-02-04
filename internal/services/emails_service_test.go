@@ -29,7 +29,7 @@ func TestCommonEmailsServiceGetUserEmailCommunications(t *testing.T) {
 				UserID:  userID,
 				Email:   "someTestEmail@gmail.com",
 				Content: "some test content",
-				SentAt:  time.Now(),
+				SentAt:  time.Now().UTC(),
 			},
 		}
 
@@ -37,7 +37,7 @@ func TestCommonEmailsServiceGetUserEmailCommunications(t *testing.T) {
 		emailsRepository := mockrepositories.NewMockEmailsRepository(mockController)
 		emailsRepository.
 			EXPECT().
-			GetUserEmailCommunications(gomock.Any(), userID).
+			GetUserCommunications(gomock.Any(), userID).
 			Return(expectedEmailCommunications, nil).
 			MaxTimes(1)
 
@@ -45,7 +45,7 @@ func TestCommonEmailsServiceGetUserEmailCommunications(t *testing.T) {
 		emailsService := services.NewCommonEmailsService(emailsRepository, logger)
 		ctx := context.Background()
 
-		emailCommunications, err := emailsService.GetUserEmailCommunications(ctx, userID)
+		emailCommunications, err := emailsService.GetUserCommunications(ctx, userID)
 		require.NoError(t, err)
 		assert.Len(t, emailCommunications, len(expectedEmailCommunications))
 		assert.Equal(t, expectedEmailCommunications, emailCommunications)
@@ -56,7 +56,7 @@ func TestCommonEmailsServiceGetUserEmailCommunications(t *testing.T) {
 		emailsRepository := mockrepositories.NewMockEmailsRepository(mockController)
 		emailsRepository.
 			EXPECT().
-			GetUserEmailCommunications(gomock.Any(), userID).
+			GetUserCommunications(gomock.Any(), userID).
 			Return([]entities.Email{}, nil).
 			MaxTimes(1)
 
@@ -64,7 +64,7 @@ func TestCommonEmailsServiceGetUserEmailCommunications(t *testing.T) {
 		emailsService := services.NewCommonEmailsService(emailsRepository, logger)
 		ctx := context.Background()
 
-		emailCommunications, err := emailsService.GetUserEmailCommunications(ctx, userID)
+		emailCommunications, err := emailsService.GetUserCommunications(ctx, userID)
 		require.NoError(t, err)
 		assert.Empty(t, emailCommunications)
 	})
@@ -74,7 +74,7 @@ func TestCommonEmailsServiceGetUserEmailCommunications(t *testing.T) {
 		emailsRepository := mockrepositories.NewMockEmailsRepository(mockController)
 		emailsRepository.
 			EXPECT().
-			GetUserEmailCommunications(gomock.Any(), userID).
+			GetUserCommunications(gomock.Any(), userID).
 			Return(nil, errors.New("some error")).
 			MaxTimes(1)
 
@@ -82,7 +82,7 @@ func TestCommonEmailsServiceGetUserEmailCommunications(t *testing.T) {
 		emailsService := services.NewCommonEmailsService(emailsRepository, logger)
 		ctx := context.Background()
 
-		emailCommunications, err := emailsService.GetUserEmailCommunications(ctx, userID)
+		emailCommunications, err := emailsService.GetUserCommunications(ctx, userID)
 		require.Error(t, err)
 		assert.Nil(t, emailCommunications)
 	})
