@@ -32,6 +32,7 @@ func (s *EmailSender) Send(ctx context.Context, subject string, body string, rec
 	defer span.End()
 
 	span.AddEvent(s.spanConfig.Events.Start.Name, s.spanConfig.Events.Start.Opts...)
+	defer span.AddEvent(s.spanConfig.Events.End.Name, s.spanConfig.Events.End.Opts...)
 
 	message := gomail.NewMessage()
 	message.SetHeader("From", s.smtpConfig.Login)
@@ -46,8 +47,5 @@ func (s *EmailSender) Send(ctx context.Context, subject string, body string, rec
 		s.smtpConfig.Password,
 	)
 
-	err := smtpClient.DialAndSend(message)
-
-	span.AddEvent(s.spanConfig.Events.End.Name, s.spanConfig.Events.End.Opts...)
-	return err
+	return smtpClient.DialAndSend(message)
 }

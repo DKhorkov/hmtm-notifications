@@ -43,6 +43,7 @@ func (b *VerifyEmailBuilder) MessageHandler() handlers.MessageHandler {
 		defer span.End()
 
 		span.AddEvent(b.spanConfig.Events.Start.Name, b.spanConfig.Events.Start.Opts...)
+		defer span.AddEvent(b.spanConfig.Events.End.Name, b.spanConfig.Events.End.Opts...)
 
 		ctx = helpers.AddTraceIDToContext(ctx, span)
 
@@ -61,8 +62,6 @@ func (b *VerifyEmailBuilder) MessageHandler() handlers.MessageHandler {
 				err,
 			)
 		}
-
-		span.AddEvent(b.spanConfig.Events.End.Name, b.spanConfig.Events.End.Opts...)
 	}
 }
 
