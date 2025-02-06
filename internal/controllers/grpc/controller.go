@@ -7,11 +7,12 @@ import (
 
 	"google.golang.org/grpc"
 
-	"github.com/DKhorkov/hmtm-notifications/internal/controllers/grpc/emails"
-	"github.com/DKhorkov/hmtm-notifications/internal/interfaces"
 	customgrpc "github.com/DKhorkov/libs/grpc/interceptors"
 	"github.com/DKhorkov/libs/logging"
 	"github.com/DKhorkov/libs/tracing"
+
+	"github.com/DKhorkov/hmtm-notifications/internal/controllers/grpc/emails"
+	"github.com/DKhorkov/hmtm-notifications/internal/interfaces"
 )
 
 // New creates an instance of gRPC Controller.

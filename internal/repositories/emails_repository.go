@@ -5,11 +5,11 @@ import (
 	"log/slog"
 	"sync"
 
-	"github.com/DKhorkov/hmtm-notifications/internal/entities"
-	"github.com/DKhorkov/libs/logging"
-
 	"github.com/DKhorkov/libs/db"
+	"github.com/DKhorkov/libs/logging"
 	"github.com/DKhorkov/libs/tracing"
+
+	"github.com/DKhorkov/hmtm-notifications/internal/entities"
 )
 
 func NewCommonEmailsRepository(

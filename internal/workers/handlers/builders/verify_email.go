@@ -8,12 +8,13 @@ import (
 
 	"github.com/nats-io/nats.go"
 
+	"github.com/DKhorkov/libs/logging"
+	"github.com/DKhorkov/libs/tracing"
+
 	"github.com/DKhorkov/hmtm-notifications/dto"
 	"github.com/DKhorkov/hmtm-notifications/internal/interfaces"
 	"github.com/DKhorkov/hmtm-notifications/internal/workers/handlers"
 	"github.com/DKhorkov/hmtm-notifications/internal/workers/handlers/helpers"
-	"github.com/DKhorkov/libs/logging"
-	"github.com/DKhorkov/libs/tracing"
 )
 
 func NewVerifyEmailBuilder(

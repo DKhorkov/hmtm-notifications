@@ -11,10 +11,11 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials/insecure"
 
-	"github.com/DKhorkov/hmtm-sso/api/protobuf/generated/go/sso"
 	customgrpc "github.com/DKhorkov/libs/grpc/interceptors"
 	"github.com/DKhorkov/libs/logging"
 	"github.com/DKhorkov/libs/tracing"
+
+	"github.com/DKhorkov/hmtm-sso/api/protobuf/generated/go/sso"
 )
 
 type Client struct {

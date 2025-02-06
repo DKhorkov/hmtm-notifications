@@ -4,24 +4,24 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/DKhorkov/hmtm-notifications/internal/contentbuilders"
-	"github.com/DKhorkov/hmtm-notifications/internal/interfaces"
-
 	"github.com/nats-io/nats.go"
+
+	"github.com/DKhorkov/libs/db"
+	"github.com/DKhorkov/libs/logging"
+	customnats "github.com/DKhorkov/libs/nats"
+	"github.com/DKhorkov/libs/tracing"
 
 	"github.com/DKhorkov/hmtm-notifications/internal/app"
 	ssogrpcclient "github.com/DKhorkov/hmtm-notifications/internal/clients/sso/grpc"
 	"github.com/DKhorkov/hmtm-notifications/internal/config"
+	"github.com/DKhorkov/hmtm-notifications/internal/contentbuilders"
 	grpccontroller "github.com/DKhorkov/hmtm-notifications/internal/controllers/grpc"
+	"github.com/DKhorkov/hmtm-notifications/internal/interfaces"
 	"github.com/DKhorkov/hmtm-notifications/internal/repositories"
 	"github.com/DKhorkov/hmtm-notifications/internal/senders"
 	"github.com/DKhorkov/hmtm-notifications/internal/services"
 	"github.com/DKhorkov/hmtm-notifications/internal/usecases"
 	"github.com/DKhorkov/hmtm-notifications/internal/workers/handlers/builders"
-	"github.com/DKhorkov/libs/db"
-	"github.com/DKhorkov/libs/logging"
-	customnats "github.com/DKhorkov/libs/nats"
-	"github.com/DKhorkov/libs/tracing"
 )
 
 func main() {

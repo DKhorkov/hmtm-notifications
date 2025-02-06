@@ -7,12 +7,13 @@ import (
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/protobuf/types/known/timestamppb"
+
+	customgrpc "github.com/DKhorkov/libs/grpc"
+	"github.com/DKhorkov/libs/logging"
 
 	"github.com/DKhorkov/hmtm-notifications/api/protobuf/generated/go/notifications"
 	"github.com/DKhorkov/hmtm-notifications/internal/interfaces"
-	customgrpc "github.com/DKhorkov/libs/grpc"
-	"github.com/DKhorkov/libs/logging"
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // RegisterServer handler (serverAPI) connects EmailsServer to gRPC server:.

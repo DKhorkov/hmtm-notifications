@@ -3,8 +3,9 @@ package senders
 import (
 	"context"
 
-	"github.com/DKhorkov/libs/tracing"
 	"gopkg.in/gomail.v2"
+
+	"github.com/DKhorkov/libs/tracing"
 
 	"github.com/DKhorkov/hmtm-notifications/internal/config"
 )
