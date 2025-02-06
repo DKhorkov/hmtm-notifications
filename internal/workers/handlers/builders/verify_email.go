@@ -8,12 +8,13 @@ import (
 
 	"github.com/nats-io/nats.go"
 
+	"github.com/DKhorkov/libs/logging"
+	"github.com/DKhorkov/libs/tracing"
+
 	"github.com/DKhorkov/hmtm-notifications/dto"
 	"github.com/DKhorkov/hmtm-notifications/internal/interfaces"
 	"github.com/DKhorkov/hmtm-notifications/internal/workers/handlers"
 	"github.com/DKhorkov/hmtm-notifications/internal/workers/handlers/helpers"
-	"github.com/DKhorkov/libs/logging"
-	"github.com/DKhorkov/libs/tracing"
 )
 
 func NewVerifyEmailBuilder(
@@ -43,6 +44,7 @@ func (b *VerifyEmailBuilder) MessageHandler() handlers.MessageHandler {
 		defer span.End()
 
 		span.AddEvent(b.spanConfig.Events.Start.Name, b.spanConfig.Events.Start.Opts...)
+		defer span.AddEvent(b.spanConfig.Events.End.Name, b.spanConfig.Events.End.Opts...)
 
 		ctx = helpers.AddTraceIDToContext(ctx, span)
 
@@ -61,8 +63,6 @@ func (b *VerifyEmailBuilder) MessageHandler() handlers.MessageHandler {
 				err,
 			)
 		}
-
-		span.AddEvent(b.spanConfig.Events.End.Name, b.spanConfig.Events.End.Opts...)
 	}
 }
 

@@ -11,6 +11,7 @@ services:
       - "${HMTM_NOTIFICATIONS_OUTER_PORT}:${HMTM_NOTIFICATIONS_INNER_PORT}"
     depends_on:
       - hmtm_notifications_database
+      - nats
     volumes:
       - ../../../logs/:/app/logs/
     networks:

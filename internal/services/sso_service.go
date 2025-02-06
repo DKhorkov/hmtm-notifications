@@ -5,9 +5,10 @@ import (
 	"fmt"
 	"log/slog"
 
+	"github.com/DKhorkov/libs/logging"
+
 	"github.com/DKhorkov/hmtm-notifications/internal/entities"
 	"github.com/DKhorkov/hmtm-notifications/internal/interfaces"
-	"github.com/DKhorkov/libs/logging"
 )
 
 func NewCommonSsoService(ssoRepository interfaces.SsoRepository, logger *slog.Logger) *CommonSsoService {

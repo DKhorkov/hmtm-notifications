@@ -5,11 +5,11 @@ import (
 	"log/slog"
 	"sync"
 
-	"github.com/DKhorkov/hmtm-notifications/internal/entities"
-	"github.com/DKhorkov/libs/logging"
-
 	"github.com/DKhorkov/libs/db"
+	"github.com/DKhorkov/libs/logging"
 	"github.com/DKhorkov/libs/tracing"
+
+	"github.com/DKhorkov/hmtm-notifications/internal/entities"
 )
 
 func NewCommonEmailsRepository(
@@ -43,6 +43,7 @@ func (repo *CommonEmailsRepository) GetUserCommunications(
 	defer span.End()
 
 	span.AddEvent(repo.spanConfig.Events.Start.Name, repo.spanConfig.Events.Start.Opts...)
+	defer span.AddEvent(repo.spanConfig.Events.End.Name, repo.spanConfig.Events.End.Opts...)
 
 	connection, err := repo.dbConnector.Connection(ctx)
 	if err != nil {
@@ -94,7 +95,6 @@ func (repo *CommonEmailsRepository) GetUserCommunications(
 		return nil, err
 	}
 
-	span.AddEvent(repo.spanConfig.Events.End.Name, repo.spanConfig.Events.End.Opts...)
 	return emails, nil
 }
 
@@ -103,6 +103,7 @@ func (repo *CommonEmailsRepository) SaveCommunication(ctx context.Context, email
 	defer span.End()
 
 	span.AddEvent(repo.spanConfig.Events.Start.Name, repo.spanConfig.Events.Start.Opts...)
+	defer span.AddEvent(repo.spanConfig.Events.End.Name, repo.spanConfig.Events.End.Opts...)
 
 	connection, err := repo.dbConnector.Connection(ctx)
 	if err != nil {
@@ -132,6 +133,5 @@ func (repo *CommonEmailsRepository) SaveCommunication(ctx context.Context, email
 		return 0, err
 	}
 
-	span.AddEvent(repo.spanConfig.Events.End.Name, repo.spanConfig.Events.End.Opts...)
 	return emailCommunicationID, nil
 }

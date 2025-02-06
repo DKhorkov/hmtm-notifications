@@ -4,12 +4,13 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/DKhorkov/hmtm-notifications/api/protobuf/generated/go/notifications"
-
-	"github.com/DKhorkov/libs/requestid"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/metadata"
+
+	"github.com/DKhorkov/libs/requestid"
+
+	"github.com/DKhorkov/hmtm-notifications/api/protobuf/generated/go/notifications"
 )
 
 type Client struct {
