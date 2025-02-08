@@ -95,12 +95,14 @@ func main() {
 	)
 
 	contentBuilders := interfaces.ContentBuilders{
-		Email: contentbuilders.NewCommonEmailContentBuilder(),
+		Email: contentbuilders.NewCommonEmailContentBuilder(
+			settings.Email.VerifyEmailURL,
+		),
 	}
 
 	communicationsSenders := interfaces.Senders{
 		Email: senders.NewEmailSender(
-			settings.EmailSMTP,
+			settings.Email.SMTP,
 			traceProvider,
 			settings.Tracing.Spans.Senders.Email,
 		),

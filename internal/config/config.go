@@ -217,11 +217,14 @@ func New() Config {
 				},
 			},
 		},
-		EmailSMTP: EmailSMTPConfig{
-			Host:     loadenv.GetEnv("EMAIL_SMTP_HOST", "smtp.freesmtpservers.com"),
-			Port:     loadenv.GetEnvAsInt("EMAIL_SMTP_PORT", 25),
-			Login:    loadenv.GetEnv("EMAIL_SMTP_LOGIN", "smtp"),
-			Password: loadenv.GetEnv("EMAIL_SMTP_PASSWORD", "smtp"),
+		Email: EmailConfig{
+			SMTP: SMTPConfig{
+				Host:     loadenv.GetEnv("EMAIL_SMTP_HOST", "smtp.freesmtpservers.com"),
+				Port:     loadenv.GetEnvAsInt("EMAIL_SMTP_PORT", 25),
+				Login:    loadenv.GetEnv("EMAIL_SMTP_LOGIN", "smtp"),
+				Password: loadenv.GetEnv("EMAIL_SMTP_PASSWORD", "smtp"),
+			},
+			VerifyEmailURL: loadenv.GetEnv("EMAIL_VERIFY_URL", "http://localhost:8080/verify-email"),
 		},
 	}
 }
@@ -291,7 +294,12 @@ type NATSWorker struct {
 	Name string
 }
 
-type EmailSMTPConfig struct {
+type EmailConfig struct {
+	SMTP           SMTPConfig
+	VerifyEmailURL string
+}
+
+type SMTPConfig struct {
 	Host     string
 	Port     int
 	Login    string
@@ -307,5 +315,5 @@ type Config struct {
 	Environment string
 	Version     string
 	NATS        NATSConfig
-	EmailSMTP   EmailSMTPConfig
+	Email       EmailConfig
 }

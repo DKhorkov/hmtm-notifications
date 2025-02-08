@@ -11,7 +11,7 @@ import (
 )
 
 func NewEmailSender(
-	smtpConfig config.EmailSMTPConfig,
+	smtpConfig config.SMTPConfig,
 	traceProvider tracing.TraceProvider,
 	spanConfig tracing.SpanConfig,
 ) *EmailSender {
@@ -23,7 +23,7 @@ func NewEmailSender(
 }
 
 type EmailSender struct {
-	smtpConfig    config.EmailSMTPConfig
+	smtpConfig    config.SMTPConfig
 	traceProvider tracing.TraceProvider
 	spanConfig    tracing.SpanConfig
 }
