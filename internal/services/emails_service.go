@@ -8,28 +8,28 @@ import (
 	"github.com/DKhorkov/hmtm-notifications/internal/interfaces"
 )
 
-func NewCommonEmailsService(
+func NewEmailsService(
 	emailsRepository interfaces.EmailsRepository,
 	logger *slog.Logger,
-) *CommonEmailsService {
-	return &CommonEmailsService{
+) *EmailsService {
+	return &EmailsService{
 		emailsRepository: emailsRepository,
 		logger:           logger,
 	}
 }
 
-type CommonEmailsService struct {
+type EmailsService struct {
 	emailsRepository interfaces.EmailsRepository
 	logger           *slog.Logger
 }
 
-func (service *CommonEmailsService) GetUserCommunications(
+func (service *EmailsService) GetUserCommunications(
 	ctx context.Context,
 	userID uint64,
 ) ([]entities.Email, error) {
 	return service.emailsRepository.GetUserCommunications(ctx, userID)
 }
 
-func (service *CommonEmailsService) SaveCommunication(ctx context.Context, email entities.Email) (uint64, error) {
+func (service *EmailsService) SaveCommunication(ctx context.Context, email entities.Email) (uint64, error) {
 	return service.emailsRepository.SaveCommunication(ctx, email)
 }

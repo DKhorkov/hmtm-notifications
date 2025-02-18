@@ -76,26 +76,26 @@ func main() {
 		panic(err)
 	}
 
-	ssoRepository := repositories.NewGrpcSsoRepository(ssoClient)
-	ssoService := services.NewCommonSsoService(
+	ssoRepository := repositories.NewSsoRepository(ssoClient)
+	ssoService := services.NewSsoService(
 		ssoRepository,
 		logger,
 	)
 
-	emailsRepository := repositories.NewCommonEmailsRepository(
+	emailsRepository := repositories.NewEmailsRepository(
 		dbConnector,
 		logger,
 		traceProvider,
 		settings.Tracing.Spans.Repositories.Emails,
 	)
 
-	emailsService := services.NewCommonEmailsService(
+	emailsService := services.NewEmailsService(
 		emailsRepository,
 		logger,
 	)
 
 	contentBuilders := interfaces.ContentBuilders{
-		Email: contentbuilders.NewCommonEmailContentBuilder(
+		Email: contentbuilders.NewEmailContentBuilder(
 			settings.Email.VerifyEmailURL,
 		),
 	}
@@ -108,7 +108,7 @@ func main() {
 		),
 	}
 
-	useCases := usecases.NewCommonUseCases(
+	useCases := usecases.New(
 		emailsService,
 		ssoService,
 		contentBuilders,
@@ -124,7 +124,7 @@ func main() {
 		settings.Tracing.Spans.Root,
 	)
 
-	verifyEmailWorker, err := customnats.NewCommonWorker(
+	verifyEmailWorker, err := customnats.NewWorker(
 		settings.NATS.ClientURL,
 		settings.NATS.Subjects.VerifyEmail,
 		customnats.WithGoroutinesPoolSize(settings.NATS.GoroutinesPoolSize),

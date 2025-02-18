@@ -12,13 +12,13 @@ import (
 	"github.com/DKhorkov/hmtm-notifications/internal/entities"
 )
 
-func NewCommonEmailsRepository(
+func NewEmailsRepository(
 	dbConnector db.Connector,
 	logger *slog.Logger,
-	traceProvider tracing.TraceProvider,
+	traceProvider tracing.Provider,
 	spanConfig tracing.SpanConfig,
-) *CommonEmailsRepository {
-	return &CommonEmailsRepository{
+) *EmailsRepository {
+	return &EmailsRepository{
 		dbConnector:   dbConnector,
 		logger:        logger,
 		traceProvider: traceProvider,
@@ -27,15 +27,15 @@ func NewCommonEmailsRepository(
 	}
 }
 
-type CommonEmailsRepository struct {
+type EmailsRepository struct {
 	dbConnector   db.Connector
 	logger        *slog.Logger
-	traceProvider tracing.TraceProvider
+	traceProvider tracing.Provider
 	spanConfig    tracing.SpanConfig
 	mutex         *sync.RWMutex
 }
 
-func (repo *CommonEmailsRepository) GetUserCommunications(
+func (repo *EmailsRepository) GetUserCommunications(
 	ctx context.Context,
 	userID uint64,
 ) ([]entities.Email, error) {
@@ -98,7 +98,7 @@ func (repo *CommonEmailsRepository) GetUserCommunications(
 	return emails, nil
 }
 
-func (repo *CommonEmailsRepository) SaveCommunication(ctx context.Context, email entities.Email) (uint64, error) {
+func (repo *EmailsRepository) SaveCommunication(ctx context.Context, email entities.Email) (uint64, error) {
 	ctx, span := repo.traceProvider.Span(ctx, tracing.CallerName(tracing.DefaultSkipLevel))
 	defer span.End()
 
