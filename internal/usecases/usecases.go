@@ -8,13 +8,13 @@ import (
 	"github.com/DKhorkov/hmtm-notifications/internal/interfaces"
 )
 
-func NewCommonUseCases(
+func New(
 	emailsService interfaces.EmailsService,
 	ssoService interfaces.SsoService,
 	contentBuilders interfaces.ContentBuilders,
 	senders interfaces.Senders,
-) *CommonUseCases {
-	return &CommonUseCases{
+) *UseCases {
+	return &UseCases{
 		emailsService:   emailsService,
 		ssoService:      ssoService,
 		contentBuilders: contentBuilders,
@@ -22,21 +22,21 @@ func NewCommonUseCases(
 	}
 }
 
-type CommonUseCases struct {
+type UseCases struct {
 	emailsService   interfaces.EmailsService
 	ssoService      interfaces.SsoService
 	contentBuilders interfaces.ContentBuilders
 	senders         interfaces.Senders
 }
 
-func (useCases *CommonUseCases) GetUserEmailCommunications(
+func (useCases *UseCases) GetUserEmailCommunications(
 	ctx context.Context,
 	userID uint64,
 ) ([]entities.Email, error) {
 	return useCases.emailsService.GetUserCommunications(ctx, userID)
 }
 
-func (useCases *CommonUseCases) SendVerifyEmailCommunication(
+func (useCases *UseCases) SendVerifyEmailCommunication(
 	ctx context.Context,
 	userID uint64,
 ) (uint64, error) {

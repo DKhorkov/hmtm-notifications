@@ -9,21 +9,21 @@ import (
 	"github.com/DKhorkov/hmtm-notifications/internal/entities"
 )
 
-func NewCommonEmailContentBuilder(verifyEmailURLBase string) *CommonEmailContentBuilder {
-	return &CommonEmailContentBuilder{
+func NewEmailContentBuilder(verifyEmailURLBase string) *EmailContentBuilder {
+	return &EmailContentBuilder{
 		verifyEmailURLBase: verifyEmailURLBase,
 	}
 }
 
-type CommonEmailContentBuilder struct {
+type EmailContentBuilder struct {
 	verifyEmailURLBase string
 }
 
-func (b *CommonEmailContentBuilder) Subject() string {
+func (b *EmailContentBuilder) Subject() string {
 	return "Подтверждение адреса электронной почты"
 }
 
-func (b *CommonEmailContentBuilder) Body(user entities.User) string {
+func (b *EmailContentBuilder) Body(user entities.User) string {
 	link := fmt.Sprintf(
 		"%s/%s",
 		b.verifyEmailURLBase,

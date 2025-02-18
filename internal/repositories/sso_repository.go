@@ -11,15 +11,15 @@ import (
 	"github.com/DKhorkov/hmtm-notifications/internal/interfaces"
 )
 
-func NewGrpcSsoRepository(client interfaces.SsoGrpcClient) *GrpcSsoRepository {
-	return &GrpcSsoRepository{client: client}
+func NewSsoRepository(client interfaces.SsoGrpcClient) *SsoRepository {
+	return &SsoRepository{client: client}
 }
 
-type GrpcSsoRepository struct {
+type SsoRepository struct {
 	client interfaces.SsoGrpcClient
 }
 
-func (repo *GrpcSsoRepository) GetUserByID(ctx context.Context, id uint64) (*entities.User, error) {
+func (repo *SsoRepository) GetUserByID(ctx context.Context, id uint64) (*entities.User, error) {
 	response, err := repo.client.GetUser(
 		ctx,
 		&sso.GetUserIn{
@@ -34,7 +34,7 @@ func (repo *GrpcSsoRepository) GetUserByID(ctx context.Context, id uint64) (*ent
 	return repo.processUserResponse(response), nil
 }
 
-func (repo *GrpcSsoRepository) GetAllUsers(ctx context.Context) ([]entities.User, error) {
+func (repo *SsoRepository) GetAllUsers(ctx context.Context) ([]entities.User, error) {
 	response, err := repo.client.GetUsers(
 		ctx,
 		&emptypb.Empty{},
@@ -52,7 +52,7 @@ func (repo *GrpcSsoRepository) GetAllUsers(ctx context.Context) ([]entities.User
 	return users, nil
 }
 
-func (repo *GrpcSsoRepository) processUserResponse(userResponse *sso.GetUserOut) *entities.User {
+func (repo *SsoRepository) processUserResponse(userResponse *sso.GetUserOut) *entities.User {
 	return &entities.User{
 		ID:                userResponse.GetID(),
 		DisplayName:       userResponse.GetDisplayName(),

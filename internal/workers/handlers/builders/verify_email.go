@@ -19,7 +19,7 @@ import (
 
 func NewVerifyEmailBuilder(
 	useCases interfaces.UseCases,
-	traceProvider tracing.TraceProvider,
+	traceProvider tracing.Provider,
 	spanConfig tracing.SpanConfig,
 	logger *slog.Logger,
 ) *VerifyEmailBuilder {
@@ -33,7 +33,7 @@ func NewVerifyEmailBuilder(
 
 type VerifyEmailBuilder struct {
 	useCases      interfaces.UseCases
-	traceProvider tracing.TraceProvider
+	traceProvider tracing.Provider
 	spanConfig    tracing.SpanConfig
 	logger        *slog.Logger
 }

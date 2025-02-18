@@ -11,19 +11,19 @@ import (
 	"github.com/DKhorkov/hmtm-notifications/internal/interfaces"
 )
 
-func NewCommonSsoService(ssoRepository interfaces.SsoRepository, logger *slog.Logger) *CommonSsoService {
-	return &CommonSsoService{
+func NewSsoService(ssoRepository interfaces.SsoRepository, logger *slog.Logger) *SsoService {
+	return &SsoService{
 		ssoRepository: ssoRepository,
 		logger:        logger,
 	}
 }
 
-type CommonSsoService struct {
+type SsoService struct {
 	ssoRepository interfaces.SsoRepository
 	logger        *slog.Logger
 }
 
-func (service *CommonSsoService) GetAllUsers(ctx context.Context) ([]entities.User, error) {
+func (service *SsoService) GetAllUsers(ctx context.Context) ([]entities.User, error) {
 	users, err := service.ssoRepository.GetAllUsers(ctx)
 	if err != nil {
 		logging.LogErrorContext(ctx, service.logger, "Error occurred while trying to get all Users", err)
@@ -32,7 +32,7 @@ func (service *CommonSsoService) GetAllUsers(ctx context.Context) ([]entities.Us
 	return users, err
 }
 
-func (service *CommonSsoService) GetUserByID(ctx context.Context, id uint64) (*entities.User, error) {
+func (service *SsoService) GetUserByID(ctx context.Context, id uint64) (*entities.User, error) {
 	user, err := service.ssoRepository.GetUserByID(ctx, id)
 	if err != nil {
 		logging.LogErrorContext(

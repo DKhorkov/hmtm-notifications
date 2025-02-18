@@ -21,7 +21,7 @@ var (
 	userID uint64 = 1
 )
 
-func TestCommonEmailsServiceGetUserEmailCommunications(t *testing.T) {
+func TestEmailsServiceGetUserEmailCommunications(t *testing.T) {
 	t.Run("get user email communications with existing email communications", func(t *testing.T) {
 		expectedEmailCommunications := []entities.Email{
 			{
@@ -42,7 +42,7 @@ func TestCommonEmailsServiceGetUserEmailCommunications(t *testing.T) {
 			MaxTimes(1)
 
 		logger := slog.New(slog.NewJSONHandler(bytes.NewBuffer(make([]byte, 1000)), nil))
-		emailsService := services.NewCommonEmailsService(emailsRepository, logger)
+		emailsService := services.NewEmailsService(emailsRepository, logger)
 		ctx := context.Background()
 
 		emailCommunications, err := emailsService.GetUserCommunications(ctx, userID)
@@ -61,7 +61,7 @@ func TestCommonEmailsServiceGetUserEmailCommunications(t *testing.T) {
 			MaxTimes(1)
 
 		logger := slog.New(slog.NewJSONHandler(bytes.NewBuffer(make([]byte, 1000)), nil))
-		emailsService := services.NewCommonEmailsService(emailsRepository, logger)
+		emailsService := services.NewEmailsService(emailsRepository, logger)
 		ctx := context.Background()
 
 		emailCommunications, err := emailsService.GetUserCommunications(ctx, userID)
@@ -79,7 +79,7 @@ func TestCommonEmailsServiceGetUserEmailCommunications(t *testing.T) {
 			MaxTimes(1)
 
 		logger := slog.New(slog.NewJSONHandler(bytes.NewBuffer(make([]byte, 1000)), nil))
-		emailsService := services.NewCommonEmailsService(emailsRepository, logger)
+		emailsService := services.NewEmailsService(emailsRepository, logger)
 		ctx := context.Background()
 
 		emailCommunications, err := emailsService.GetUserCommunications(ctx, userID)
