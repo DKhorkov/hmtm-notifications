@@ -153,7 +153,7 @@ func New() Config {
 						},
 						Events: tracing.SpanEventsConfig{
 							Start: tracing.SpanEventConfig{
-								Name: "Calling verify email worker handler",
+								Name: "Calling verify-email worker handler",
 								Opts: []trace.EventOption{
 									trace.WithAttributes(
 										attribute.String("Environment", loadenv.GetEnv("ENVIRONMENT", "local")),
@@ -161,7 +161,32 @@ func New() Config {
 								},
 							},
 							End: tracing.SpanEventConfig{
-								Name: "Received response from verify email worker handler",
+								Name: "Received response from verify-email worker handler",
+								Opts: []trace.EventOption{
+									trace.WithAttributes(
+										attribute.String("Environment", loadenv.GetEnv("ENVIRONMENT", "local")),
+									),
+								},
+							},
+						},
+					},
+					ForgetPassword: tracing.SpanConfig{
+						Opts: []trace.SpanStartOption{
+							trace.WithAttributes(
+								attribute.String("Environment", loadenv.GetEnv("ENVIRONMENT", "local")),
+							),
+						},
+						Events: tracing.SpanEventsConfig{
+							Start: tracing.SpanEventConfig{
+								Name: "Calling forget-password worker handler",
+								Opts: []trace.EventOption{
+									trace.WithAttributes(
+										attribute.String("Environment", loadenv.GetEnv("ENVIRONMENT", "local")),
+									),
+								},
+							},
+							End: tracing.SpanEventConfig{
+								Name: "Received response from forget-password worker handler",
 								Opts: []trace.EventOption{
 									trace.WithAttributes(
 										attribute.String("Environment", loadenv.GetEnv("ENVIRONMENT", "local")),
@@ -209,11 +234,15 @@ func New() Config {
 				loadenv.GetEnvAsInt("NATS_CLIENT_PORT", 4222),
 			),
 			Subjects: NATSSubjects{
-				VerifyEmail: loadenv.GetEnv("NATS_VERIFY_EMAIL_SUBJECT", "verify-email"),
+				VerifyEmail:    loadenv.GetEnv("NATS_VERIFY_EMAIL_SUBJECT", "verify-email"),
+				ForgetPassword: loadenv.GetEnv("NATS_FORGET_PASSWORD_SUBJECT", "forget-password"),
 			},
 			Workers: NATSWorkers{
 				VerifyEmail: NATSWorker{
 					Name: loadenv.GetEnv("NATS_VERIFY_EMAIL_WORKER_NAME", "verify-email-worker"),
+				},
+				ForgetPassword: NATSWorker{
+					Name: loadenv.GetEnv("NATS_FORGET_PASSWORD_WORKER_NAME", "forget-password-worker"),
 				},
 			},
 		},
@@ -224,7 +253,8 @@ func New() Config {
 				Login:    loadenv.GetEnv("EMAIL_SMTP_LOGIN", "smtp"),
 				Password: loadenv.GetEnv("EMAIL_SMTP_PASSWORD", "smtp"),
 			},
-			VerifyEmailURL: loadenv.GetEnv("EMAIL_VERIFY_URL", "http://localhost:8080/verify-email"),
+			VerifyEmailURL:    loadenv.GetEnv("EMAIL_VERIFY_URL", "http://localhost:8080/verify-email"),
+			ForgetPasswordURL: loadenv.GetEnv("FORGET_PASSWORD_URL", "http://localhost:8080/forget-password"),
 		},
 	}
 }
@@ -259,7 +289,8 @@ type SpansConfig struct {
 }
 
 type SpanHandlers struct {
-	VerifyEmail tracing.SpanConfig
+	VerifyEmail    tracing.SpanConfig
+	ForgetPassword tracing.SpanConfig
 }
 
 type SpanSenders struct {
@@ -283,11 +314,13 @@ type NATSConfig struct {
 }
 
 type NATSSubjects struct {
-	VerifyEmail string
+	VerifyEmail    string
+	ForgetPassword string
 }
 
 type NATSWorkers struct {
-	VerifyEmail NATSWorker
+	VerifyEmail    NATSWorker
+	ForgetPassword NATSWorker
 }
 
 type NATSWorker struct {
@@ -295,8 +328,9 @@ type NATSWorker struct {
 }
 
 type EmailConfig struct {
-	SMTP           SMTPConfig
-	VerifyEmailURL string
+	SMTP              SMTPConfig
+	VerifyEmailURL    string
+	ForgetPasswordURL string
 }
 
 type SMTPConfig struct {

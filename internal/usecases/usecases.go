@@ -47,8 +47,8 @@ func (useCases *UseCases) SendVerifyEmailCommunication(
 
 	if err = useCases.senders.Email.Send(
 		ctx,
-		useCases.contentBuilders.Email.Subject(),
-		useCases.contentBuilders.Email.Body(*user),
+		useCases.contentBuilders.VerifyEmail.Subject(),
+		useCases.contentBuilders.VerifyEmail.Body(*user),
 		[]string{user.Email},
 	); err != nil {
 		return 0, err
@@ -57,7 +57,36 @@ func (useCases *UseCases) SendVerifyEmailCommunication(
 	emailCommunication := entities.Email{
 		UserID:  user.ID,
 		Email:   user.Email,
-		Content: useCases.contentBuilders.Email.Body(*user),
+		Content: useCases.contentBuilders.VerifyEmail.Body(*user),
+		SentAt:  time.Now().UTC(),
+	}
+
+	return useCases.emailsService.SaveCommunication(ctx, emailCommunication)
+}
+
+func (useCases *UseCases) SendForgetPasswordCommunication(
+	ctx context.Context,
+	userID uint64,
+	newPassword string,
+) (uint64, error) {
+	user, err := useCases.ssoService.GetUserByID(ctx, userID)
+	if err != nil {
+		return 0, err
+	}
+
+	if err = useCases.senders.Email.Send(
+		ctx,
+		useCases.contentBuilders.ForgetPassword.Subject(),
+		useCases.contentBuilders.ForgetPassword.Body(*user, newPassword),
+		[]string{user.Email},
+	); err != nil {
+		return 0, err
+	}
+
+	emailCommunication := entities.Email{
+		UserID:  user.ID,
+		Email:   user.Email,
+		Content: useCases.contentBuilders.ForgetPassword.Body(*user, newPassword),
 		SentAt:  time.Now().UTC(),
 	}
 

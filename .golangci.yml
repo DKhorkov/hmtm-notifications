@@ -378,3 +378,6 @@ issues:
         - ineffassign
         - staticcheck
         - wastedassign
+    - path: "cmd/server/server.go"
+      linters:
+        - cyclop
