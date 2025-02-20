@@ -95,8 +95,11 @@ func main() {
 	)
 
 	contentBuilders := interfaces.ContentBuilders{
-		Email: contentbuilders.NewEmailContentBuilder(
+		VerifyEmail: contentbuilders.NewVerifyEmailContentBuilder(
 			settings.Email.VerifyEmailURL,
+		),
+		ForgetPassword: contentbuilders.NewForgetPasswordContentBuilder(
+			settings.Email.ForgetPasswordURL,
 		),
 	}
 
@@ -153,6 +156,40 @@ func main() {
 			logging.LogError(
 				logger,
 				fmt.Sprintf("Error shutting down \"%s\" worker", settings.NATS.Workers.VerifyEmail.Name),
+				err,
+			)
+		}
+	}()
+
+	forgetPasswordWorker, err := customnats.NewWorker(
+		settings.NATS.ClientURL,
+		settings.NATS.Subjects.ForgetPassword,
+		customnats.WithGoroutinesPoolSize(settings.NATS.GoroutinesPoolSize),
+		customnats.WithMessageChannelBufferSize(settings.NATS.MessageChannelBufferSize),
+		customnats.WithNatsOptions(nats.Name(settings.NATS.Workers.ForgetPassword.Name)),
+		customnats.WithMessageHandler(
+			builders.NewForgetPasswordBuilder(
+				useCases,
+				traceProvider,
+				settings.Tracing.Spans.Handlers.ForgetPassword,
+				logger,
+			).MessageHandler(),
+		),
+	)
+
+	if err != nil {
+		panic(err)
+	}
+
+	if err = forgetPasswordWorker.Run(); err != nil {
+		panic(err)
+	}
+
+	defer func() {
+		if err = forgetPasswordWorker.Stop(); err != nil {
+			logging.LogError(
+				logger,
+				fmt.Sprintf("Error shutting down \"%s\" worker", settings.NATS.Workers.ForgetPassword.Name),
 				err,
 			)
 		}

@@ -9,4 +9,5 @@ import (
 type UseCases interface {
 	GetUserEmailCommunications(ctx context.Context, userID uint64) ([]entities.Email, error)
 	SendVerifyEmailCommunication(ctx context.Context, userID uint64) (emailID uint64, err error)
+	SendForgetPasswordCommunication(ctx context.Context, userID uint64, newPassword string) (emailID uint64, err error)
 }
