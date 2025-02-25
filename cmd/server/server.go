@@ -26,7 +26,7 @@ import (
 
 func main() {
 	settings := config.New()
-	logger := logging.GetInstance(
+	logger := logging.New(
 		settings.Logging.Level,
 		settings.Logging.LogFilePath,
 	)

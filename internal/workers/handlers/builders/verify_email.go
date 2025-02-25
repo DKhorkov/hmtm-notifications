@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log/slog"
 
 	"github.com/nats-io/nats.go"
 
@@ -21,7 +20,7 @@ func NewVerifyEmailBuilder(
 	useCases interfaces.UseCases,
 	traceProvider tracing.Provider,
 	spanConfig tracing.SpanConfig,
-	logger *slog.Logger,
+	logger logging.Logger,
 ) *VerifyEmailBuilder {
 	return &VerifyEmailBuilder{
 		useCases:      useCases,
@@ -35,7 +34,7 @@ type VerifyEmailBuilder struct {
 	useCases      interfaces.UseCases
 	traceProvider tracing.Provider
 	spanConfig    tracing.SpanConfig
-	logger        *slog.Logger
+	logger        logging.Logger
 }
 
 func (b *VerifyEmailBuilder) MessageHandler() handlers.MessageHandler {
