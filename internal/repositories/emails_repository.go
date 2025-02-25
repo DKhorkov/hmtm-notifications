@@ -2,7 +2,6 @@ package repositories
 
 import (
 	"context"
-	"log/slog"
 	"sync"
 
 	"github.com/DKhorkov/libs/db"
@@ -14,7 +13,7 @@ import (
 
 func NewEmailsRepository(
 	dbConnector db.Connector,
-	logger *slog.Logger,
+	logger logging.Logger,
 	traceProvider tracing.Provider,
 	spanConfig tracing.SpanConfig,
 ) *EmailsRepository {
@@ -29,7 +28,7 @@ func NewEmailsRepository(
 
 type EmailsRepository struct {
 	dbConnector   db.Connector
-	logger        *slog.Logger
+	logger        logging.Logger
 	traceProvider tracing.Provider
 	spanConfig    tracing.SpanConfig
 	mutex         *sync.RWMutex

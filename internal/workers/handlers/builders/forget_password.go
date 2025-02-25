@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log/slog"
 
 	"github.com/nats-io/nats.go"
 
@@ -21,7 +20,7 @@ func NewForgetPasswordBuilder(
 	useCases interfaces.UseCases,
 	traceProvider tracing.Provider,
 	spanConfig tracing.SpanConfig,
-	logger *slog.Logger,
+	logger logging.Logger,
 ) *ForgetPasswordBuilder {
 	return &ForgetPasswordBuilder{
 		useCases:      useCases,
@@ -35,7 +34,7 @@ type ForgetPasswordBuilder struct {
 	useCases      interfaces.UseCases
 	traceProvider tracing.Provider
 	spanConfig    tracing.SpanConfig
-	logger        *slog.Logger
+	logger        logging.Logger
 }
 
 func (b *ForgetPasswordBuilder) MessageHandler() handlers.MessageHandler {

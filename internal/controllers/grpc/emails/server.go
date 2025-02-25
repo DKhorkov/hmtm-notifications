@@ -3,7 +3,6 @@ package emails
 import (
 	"context"
 	"fmt"
-	"log/slog"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -17,7 +16,7 @@ import (
 )
 
 // RegisterServer handler (serverAPI) connects EmailsServer to gRPC server:.
-func RegisterServer(gRPCServer *grpc.Server, useCases interfaces.UseCases, logger *slog.Logger) {
+func RegisterServer(gRPCServer *grpc.Server, useCases interfaces.UseCases, logger logging.Logger) {
 	notifications.RegisterEmailsServiceServer(gRPCServer, &ServerAPI{useCases: useCases, logger: logger})
 }
 
@@ -25,7 +24,7 @@ type ServerAPI struct {
 	// Helps to test single endpoints, if others is not implemented yet
 	notifications.UnimplementedEmailsServiceServer
 	useCases interfaces.UseCases
-	logger   *slog.Logger
+	logger   logging.Logger
 }
 
 func (api ServerAPI) GetUserEmailCommunications(

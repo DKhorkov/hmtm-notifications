@@ -2,7 +2,8 @@ package services
 
 import (
 	"context"
-	"log/slog"
+
+	"github.com/DKhorkov/libs/logging"
 
 	"github.com/DKhorkov/hmtm-notifications/internal/entities"
 	"github.com/DKhorkov/hmtm-notifications/internal/interfaces"
@@ -10,7 +11,7 @@ import (
 
 func NewEmailsService(
 	emailsRepository interfaces.EmailsRepository,
-	logger *slog.Logger,
+	logger logging.Logger,
 ) *EmailsService {
 	return &EmailsService{
 		emailsRepository: emailsRepository,
@@ -20,7 +21,7 @@ func NewEmailsService(
 
 type EmailsService struct {
 	emailsRepository interfaces.EmailsRepository
-	logger           *slog.Logger
+	logger           logging.Logger
 }
 
 func (service *EmailsService) GetUserCommunications(
