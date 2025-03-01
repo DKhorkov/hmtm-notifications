@@ -1,16 +1,16 @@
 package services_test
 
 import (
-	"bytes"
 	"context"
 	"errors"
-	"log/slog"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
+
+	loggermock "github.com/DKhorkov/libs/logging/mocks"
 
 	"github.com/DKhorkov/hmtm-notifications/internal/entities"
 	"github.com/DKhorkov/hmtm-notifications/internal/services"
@@ -22,68 +22,91 @@ var (
 )
 
 func TestEmailsServiceGetUserEmailCommunications(t *testing.T) {
-	t.Run("get user email communications with existing email communications", func(t *testing.T) {
-		expectedEmailCommunications := []entities.Email{
-			{
-				ID:      1,
-				UserID:  userID,
-				Email:   "someTestEmail@gmail.com",
-				Content: "some test content",
-				SentAt:  time.Now().UTC(),
+	now := time.Now()
+	testCases := []struct {
+		name          string
+		userID        uint64
+		setupMocks    func(emailsRepository *mockrepositories.MockEmailsRepository, logger *loggermock.MockLogger)
+		expected      []entities.Email
+		errorExpected bool
+	}{
+		{
+			name:   "get user email communications with existing email communications",
+			userID: userID,
+			expected: []entities.Email{
+				{
+					ID:      1,
+					UserID:  userID,
+					Email:   "someTestEmail@gmail.com",
+					Content: "some test content",
+					SentAt:  now,
+				},
 			},
-		}
+			setupMocks: func(emailsRepository *mockrepositories.MockEmailsRepository, _ *loggermock.MockLogger) {
+				emailsRepository.
+					EXPECT().
+					GetUserCommunications(gomock.Any(), userID).
+					Return(
+						[]entities.Email{
+							{
+								ID:      1,
+								UserID:  userID,
+								Email:   "someTestEmail@gmail.com",
+								Content: "some test content",
+								SentAt:  now,
+							},
+						},
+						nil,
+					).
+					MaxTimes(1)
+			},
+		},
+		{
+			name:     "get user email communications without existing email communications",
+			userID:   userID,
+			expected: []entities.Email{},
+			setupMocks: func(emailsRepository *mockrepositories.MockEmailsRepository, _ *loggermock.MockLogger) {
+				emailsRepository.
+					EXPECT().
+					GetUserCommunications(gomock.Any(), userID).
+					Return([]entities.Email{}, nil).
+					MaxTimes(1)
+			},
+		},
+		{
+			name:   "get user email communications fail",
+			userID: userID,
+			setupMocks: func(emailsRepository *mockrepositories.MockEmailsRepository, _ *loggermock.MockLogger) {
+				emailsRepository.
+					EXPECT().
+					GetUserCommunications(gomock.Any(), userID).
+					Return(nil, errors.New("some error")).
+					MaxTimes(1)
+			},
+			errorExpected: true,
+		},
+	}
 
-		mockController := gomock.NewController(t)
-		emailsRepository := mockrepositories.NewMockEmailsRepository(mockController)
-		emailsRepository.
-			EXPECT().
-			GetUserCommunications(gomock.Any(), userID).
-			Return(expectedEmailCommunications, nil).
-			MaxTimes(1)
+	ctx := context.Background()
+	mockController := gomock.NewController(t)
+	logger := loggermock.NewMockLogger(mockController)
+	emailsRepository := mockrepositories.NewMockEmailsRepository(mockController)
+	emailsService := services.NewEmailsService(emailsRepository, logger)
 
-		logger := slog.New(slog.NewJSONHandler(bytes.NewBuffer(make([]byte, 1000)), nil))
-		emailsService := services.NewEmailsService(emailsRepository, logger)
-		ctx := context.Background()
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			if tc.setupMocks != nil {
+				tc.setupMocks(emailsRepository, logger)
+			}
 
-		emailCommunications, err := emailsService.GetUserCommunications(ctx, userID)
-		require.NoError(t, err)
-		assert.Len(t, emailCommunications, len(expectedEmailCommunications))
-		assert.Equal(t, expectedEmailCommunications, emailCommunications)
-	})
+			actual, err := emailsService.GetUserCommunications(ctx, tc.userID)
+			if tc.errorExpected {
+				require.Error(t, err)
+			} else {
+				require.NoError(t, err)
+			}
 
-	t.Run("get user email communications with existing email communications", func(t *testing.T) {
-		mockController := gomock.NewController(t)
-		emailsRepository := mockrepositories.NewMockEmailsRepository(mockController)
-		emailsRepository.
-			EXPECT().
-			GetUserCommunications(gomock.Any(), userID).
-			Return([]entities.Email{}, nil).
-			MaxTimes(1)
-
-		logger := slog.New(slog.NewJSONHandler(bytes.NewBuffer(make([]byte, 1000)), nil))
-		emailsService := services.NewEmailsService(emailsRepository, logger)
-		ctx := context.Background()
-
-		emailCommunications, err := emailsService.GetUserCommunications(ctx, userID)
-		require.NoError(t, err)
-		assert.Empty(t, emailCommunications)
-	})
-
-	t.Run("get user email communications fail", func(t *testing.T) {
-		mockController := gomock.NewController(t)
-		emailsRepository := mockrepositories.NewMockEmailsRepository(mockController)
-		emailsRepository.
-			EXPECT().
-			GetUserCommunications(gomock.Any(), userID).
-			Return(nil, errors.New("some error")).
-			MaxTimes(1)
-
-		logger := slog.New(slog.NewJSONHandler(bytes.NewBuffer(make([]byte, 1000)), nil))
-		emailsService := services.NewEmailsService(emailsRepository, logger)
-		ctx := context.Background()
-
-		emailCommunications, err := emailsService.GetUserCommunications(ctx, userID)
-		require.Error(t, err)
-		assert.Nil(t, emailCommunications)
-	})
+			assert.Equal(t, tc.expected, actual)
+		})
+	}
 }
