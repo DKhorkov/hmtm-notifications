@@ -4,11 +4,24 @@ import (
 	"context"
 	"sync"
 
+	sq "github.com/Masterminds/squirrel"
+
 	"github.com/DKhorkov/libs/db"
 	"github.com/DKhorkov/libs/logging"
 	"github.com/DKhorkov/libs/tracing"
 
 	"github.com/DKhorkov/hmtm-notifications/internal/entities"
+)
+
+const (
+	selectAllColumns       = "*"
+	emailsTableName        = "emails"
+	idColumnName           = "id"
+	userIDColumnName       = "user_id"
+	emailEmailColumnName   = "email"
+	emailContentColumnName = "content"
+	emailSentAtColumnName  = "sent_at"
+	returningIDSuffix      = "RETURNING id"
 )
 
 func NewEmailsRepository(
@@ -51,16 +64,25 @@ func (repo *EmailsRepository) GetUserCommunications(
 
 	defer db.CloseConnectionContext(ctx, connection, repo.logger)
 
+	stmt, params, err := sq.
+		Select(selectAllColumns).
+		From(emailsTableName).
+		Where(sq.Eq{userIDColumnName: userID}).
+		PlaceholderFormat(sq.Dollar).
+		ToSql()
+
+	if err != nil {
+		return nil, err
+	}
+
+	// Using mutex for concurrent-safety purpose of using via workers:
 	repo.mutex.RLock()
 	defer repo.mutex.RUnlock()
+
 	rows, err := connection.QueryContext(
 		ctx,
-		`
-			SELECT * 
-			FROM emails AS e
-			WHERE e.user_id = $1
-		`,
-		userID,
+		stmt,
+		params...,
 	)
 
 	if err != nil {
@@ -111,24 +133,34 @@ func (repo *EmailsRepository) SaveCommunication(ctx context.Context, email entit
 
 	defer db.CloseConnectionContext(ctx, connection, repo.logger)
 
+	stmt, params, err := sq.
+		Insert(emailsTableName).
+		Columns(
+			userIDColumnName,
+			emailEmailColumnName,
+			emailContentColumnName,
+			emailSentAtColumnName,
+		).
+		Values(
+			email.UserID,
+			email.Email,
+			email.Content,
+			email.SentAt,
+		).
+		Suffix(returningIDSuffix).
+		PlaceholderFormat(sq.Dollar). // pq postgres driver works only with $ placeholders
+		ToSql()
+
+	if err != nil {
+		return 0, err
+	}
+
+	// Using mutex for concurrent-safety purpose of using via workers:
 	repo.mutex.Lock()
 	defer repo.mutex.Unlock()
 
 	var emailCommunicationID uint64
-	err = connection.QueryRowContext(
-		ctx,
-		`
-			INSERT INTO emails (user_id, email, content, sent_at) 
-			VALUES ($1, $2, $3, $4)
-			RETURNING emails.id
-		`,
-		email.UserID,
-		email.Email,
-		email.Content,
-		email.SentAt,
-	).Scan(&emailCommunicationID)
-
-	if err != nil {
+	if err = connection.QueryRowContext(ctx, stmt, params...).Scan(&emailCommunicationID); err != nil {
 		return 0, err
 	}
 

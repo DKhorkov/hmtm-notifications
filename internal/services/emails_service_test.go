@@ -58,7 +58,7 @@ func TestEmailsServiceGetUserEmailCommunications(t *testing.T) {
 						},
 						nil,
 					).
-					MaxTimes(1)
+					Times(1)
 			},
 		},
 		{
@@ -70,7 +70,7 @@ func TestEmailsServiceGetUserEmailCommunications(t *testing.T) {
 					EXPECT().
 					GetUserCommunications(gomock.Any(), userID).
 					Return([]entities.Email{}, nil).
-					MaxTimes(1)
+					Times(1)
 			},
 		},
 		{
@@ -81,7 +81,7 @@ func TestEmailsServiceGetUserEmailCommunications(t *testing.T) {
 					EXPECT().
 					GetUserCommunications(gomock.Any(), userID).
 					Return(nil, errors.New("some error")).
-					MaxTimes(1)
+					Times(1)
 			},
 			errorExpected: true,
 		},
