@@ -2,6 +2,7 @@ package contentbuilders
 
 import (
 	"fmt"
+
 	"github.com/DKhorkov/hmtm-notifications/internal/entities"
 )
 
