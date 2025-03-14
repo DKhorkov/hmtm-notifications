@@ -4,7 +4,7 @@ go 1.23.4
 
 require (
 	github.com/DKhorkov/hmtm-sso v1.4.1
-	github.com/DKhorkov/libs v1.5.2
+	github.com/DKhorkov/libs v1.7.0
 	github.com/Masterminds/squirrel v1.5.4
 	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.2.0
 	github.com/nats-io/nats.go v1.38.0
