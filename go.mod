@@ -3,7 +3,7 @@ module github.com/DKhorkov/hmtm-notifications
 go 1.23.4
 
 require (
-	github.com/DKhorkov/hmtm-sso v1.1.3
+	github.com/DKhorkov/hmtm-sso v1.4.1
 	github.com/DKhorkov/libs v1.5.2
 	github.com/Masterminds/squirrel v1.5.4
 	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.2.0
