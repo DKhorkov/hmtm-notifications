@@ -27,7 +27,7 @@ func (b *VerifyEmailContentBuilder) Body(user entities.User) string {
 	link := fmt.Sprintf(
 		"%s/%s",
 		b.verifyEmailURLBase,
-		security.Encode([]byte(strconv.FormatUint(user.ID, 10))),
+		security.RawEncode([]byte(strconv.FormatUint(user.ID, 10))),
 	)
 
 	template := `<p>Добрый день, %s!</p>
