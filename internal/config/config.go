@@ -253,8 +253,8 @@ func New() Config {
 				Login:    loadenv.GetEnv("EMAIL_SMTP_LOGIN", "smtp"),
 				Password: loadenv.GetEnv("EMAIL_SMTP_PASSWORD", "smtp"),
 			},
-			VerifyEmailURL:    loadenv.GetEnv("EMAIL_VERIFY_URL", "http://localhost:8080/verify-email"),
-			ForgetPasswordURL: loadenv.GetEnv("FORGET_PASSWORD_URL", "http://localhost:8080/forget-password"),
+			VerifyEmailURL:    loadenv.GetEnv("EMAIL_VERIFY_URL", "http://localhost:8090/verify-email"),
+			ForgetPasswordURL: loadenv.GetEnv("FORGET_PASSWORD_URL", "http://localhost:8090/forget-password"),
 		},
 	}
 }
