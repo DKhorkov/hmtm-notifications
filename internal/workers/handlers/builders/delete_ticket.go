@@ -3,7 +3,6 @@ package builders
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 
 	"github.com/nats-io/nats.go"
 
@@ -16,13 +15,13 @@ import (
 	"github.com/DKhorkov/hmtm-notifications/internal/workers/handlers/helpers"
 )
 
-func NewForgetPasswordBuilder(
+func NewDeleteTicketBuilder(
 	useCases interfaces.UseCases,
 	traceProvider tracing.Provider,
 	spanConfig tracing.SpanConfig,
 	logger logging.Logger,
-) *ForgetPasswordBuilder {
-	return &ForgetPasswordBuilder{
+) *DeleteTicketBuilder {
+	return &DeleteTicketBuilder{
 		useCases:      useCases,
 		traceProvider: traceProvider,
 		spanConfig:    spanConfig,
@@ -30,14 +29,14 @@ func NewForgetPasswordBuilder(
 	}
 }
 
-type ForgetPasswordBuilder struct {
+type DeleteTicketBuilder struct {
 	useCases      interfaces.UseCases
 	traceProvider tracing.Provider
 	spanConfig    tracing.SpanConfig
 	logger        logging.Logger
 }
 
-func (b *ForgetPasswordBuilder) MessageHandler() handlers.MessageHandler {
+func (b *DeleteTicketBuilder) MessageHandler() handlers.MessageHandler {
 	return func(message *nats.Msg) {
 		ctx, span := b.traceProvider.Span(context.Background(), tracing.CallerName(tracing.DefaultSkipLevel))
 		defer span.End()
@@ -47,31 +46,30 @@ func (b *ForgetPasswordBuilder) MessageHandler() handlers.MessageHandler {
 
 		ctx = helpers.AddTraceIDToContext(ctx, span)
 
-		forgetPasswordDTO := b.natsMessageToDTO(message)
-		if forgetPasswordDTO == nil {
+		deleteTicketDTO := b.natsMessageToDTO(message)
+		if deleteTicketDTO == nil {
 			return
 		}
 
-		if _, err := b.useCases.SendForgetPasswordEmailCommunication(
+		if _, err := b.useCases.SendDeleteTicketEmailCommunication(
 			ctx,
-			forgetPasswordDTO.UserID,
-			forgetPasswordDTO.NewPassword,
+			*deleteTicketDTO,
 		); err != nil {
 			logging.LogError(
 				b.logger,
-				fmt.Sprintf("Failed to send forget-password message to User with ID=%d ", forgetPasswordDTO.UserID),
+				"Failed to send delete-ticket message",
 				err,
 			)
 		}
 	}
 }
 
-func (b *ForgetPasswordBuilder) natsMessageToDTO(message *nats.Msg) *dto.ForgetPasswordDTO {
-	var forgetPasswordDTO dto.ForgetPasswordDTO
-	if err := json.Unmarshal(message.Data, &forgetPasswordDTO); err != nil {
-		logging.LogError(b.logger, "Failed to unmarshal forget-password message", err)
+func (b *DeleteTicketBuilder) natsMessageToDTO(message *nats.Msg) *dto.DeleteTicketDTO {
+	var deleteTicketDTO dto.DeleteTicketDTO
+	if err := json.Unmarshal(message.Data, &deleteTicketDTO); err != nil {
+		logging.LogError(b.logger, "Failed to unmarshal delete-ticket message", err)
 		return nil
 	}
 
-	return &forgetPasswordDTO
+	return &deleteTicketDTO
 }

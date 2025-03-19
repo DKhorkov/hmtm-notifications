@@ -16,13 +16,13 @@ import (
 	"github.com/DKhorkov/hmtm-notifications/internal/workers/handlers/helpers"
 )
 
-func NewForgetPasswordBuilder(
+func NewUpdateTicketBuilder(
 	useCases interfaces.UseCases,
 	traceProvider tracing.Provider,
 	spanConfig tracing.SpanConfig,
 	logger logging.Logger,
-) *ForgetPasswordBuilder {
-	return &ForgetPasswordBuilder{
+) *UpdateTicketBuilder {
+	return &UpdateTicketBuilder{
 		useCases:      useCases,
 		traceProvider: traceProvider,
 		spanConfig:    spanConfig,
@@ -30,14 +30,14 @@ func NewForgetPasswordBuilder(
 	}
 }
 
-type ForgetPasswordBuilder struct {
+type UpdateTicketBuilder struct {
 	useCases      interfaces.UseCases
 	traceProvider tracing.Provider
 	spanConfig    tracing.SpanConfig
 	logger        logging.Logger
 }
 
-func (b *ForgetPasswordBuilder) MessageHandler() handlers.MessageHandler {
+func (b *UpdateTicketBuilder) MessageHandler() handlers.MessageHandler {
 	return func(message *nats.Msg) {
 		ctx, span := b.traceProvider.Span(context.Background(), tracing.CallerName(tracing.DefaultSkipLevel))
 		defer span.End()
@@ -47,31 +47,30 @@ func (b *ForgetPasswordBuilder) MessageHandler() handlers.MessageHandler {
 
 		ctx = helpers.AddTraceIDToContext(ctx, span)
 
-		forgetPasswordDTO := b.natsMessageToDTO(message)
-		if forgetPasswordDTO == nil {
+		updateTicketDTO := b.natsMessageToDTO(message)
+		if updateTicketDTO == nil {
 			return
 		}
 
-		if _, err := b.useCases.SendForgetPasswordEmailCommunication(
+		if _, err := b.useCases.SendUpdateTicketEmailCommunication(
 			ctx,
-			forgetPasswordDTO.UserID,
-			forgetPasswordDTO.NewPassword,
+			updateTicketDTO.TicketID,
 		); err != nil {
 			logging.LogError(
 				b.logger,
-				fmt.Sprintf("Failed to send forget-password message to User with ID=%d ", forgetPasswordDTO.UserID),
+				fmt.Sprintf("Failed to send update-ticket message for Ticket with ID=%d ", updateTicketDTO.TicketID),
 				err,
 			)
 		}
 	}
 }
 
-func (b *ForgetPasswordBuilder) natsMessageToDTO(message *nats.Msg) *dto.ForgetPasswordDTO {
-	var forgetPasswordDTO dto.ForgetPasswordDTO
-	if err := json.Unmarshal(message.Data, &forgetPasswordDTO); err != nil {
-		logging.LogError(b.logger, "Failed to unmarshal forget-password message", err)
+func (b *UpdateTicketBuilder) natsMessageToDTO(message *nats.Msg) *dto.UpdateTicketDTO {
+	var updateTicketDTO dto.UpdateTicketDTO
+	if err := json.Unmarshal(message.Data, &updateTicketDTO); err != nil {
+		logging.LogError(b.logger, "Failed to unmarshal update-ticket message", err)
 		return nil
 	}
 
-	return &forgetPasswordDTO
+	return &updateTicketDTO
 }
