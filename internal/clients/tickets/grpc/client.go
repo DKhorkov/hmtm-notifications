@@ -1,4 +1,4 @@
-package ssogrpcclient
+package ticketsgrpcclient
 
 import (
 	"fmt"
@@ -10,16 +10,15 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials/insecure"
 
+	"github.com/DKhorkov/hmtm-tickets/api/protobuf/generated/go/tickets"
 	customgrpc "github.com/DKhorkov/libs/grpc/interceptors"
 	"github.com/DKhorkov/libs/logging"
 	"github.com/DKhorkov/libs/tracing"
-
-	"github.com/DKhorkov/hmtm-sso/api/protobuf/generated/go/sso"
 )
 
 type Client struct {
-	sso.AuthServiceClient
-	sso.UsersServiceClient
+	tickets.TicketsServiceClient
+	tickets.RespondsServiceClient
 }
 
 func New(
@@ -46,7 +45,7 @@ func New(
 		),
 	}
 
-	// Create connection with SSO gRPC-server for client:
+	// Create connection with Tickets gRPC-server for client:
 	clientConnection, err := grpc.NewClient(
 		fmt.Sprintf("%s:%d", host, port),
 		grpc.WithTransportCredentials(
@@ -65,7 +64,7 @@ func New(
 	if err != nil {
 		logging.LogError(
 			logger,
-			"Failed to create SSO gRPC client",
+			"Failed to create Tickets gRPC client",
 			err,
 		)
 
@@ -73,7 +72,7 @@ func New(
 	}
 
 	return &Client{
-		AuthServiceClient:  sso.NewAuthServiceClient(clientConnection),
-		UsersServiceClient: sso.NewUsersServiceClient(clientConnection),
+		TicketsServiceClient:  tickets.NewTicketsServiceClient(clientConnection),
+		RespondsServiceClient: tickets.NewRespondsServiceClient(clientConnection),
 	}, nil
 }

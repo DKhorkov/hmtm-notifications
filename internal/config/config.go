@@ -53,6 +53,22 @@ func New() Config {
 					loadenv.GetEnvAsInt("SSO_RETRIES_TIMEOUT", 1),
 				),
 			},
+			Toys: ClientConfig{
+				Host:         loadenv.GetEnv("TOYS_CLIENT_HOST", "0.0.0.0"),
+				Port:         loadenv.GetEnvAsInt("TOYS_CLIENT_PORT", 8060),
+				RetriesCount: loadenv.GetEnvAsInt("TOYS_RETRIES_COUNT", 3),
+				RetryTimeout: time.Second * time.Duration(
+					loadenv.GetEnvAsInt("TOYS_RETRIES_TIMEOUT", 1),
+				),
+			},
+			Tickets: ClientConfig{
+				Host:         loadenv.GetEnv("TICKETS_CLIENT_HOST", "0.0.0.0"),
+				Port:         loadenv.GetEnvAsInt("TICKETS_CLIENT_PORT", 8050),
+				RetriesCount: loadenv.GetEnvAsInt("TICKETS_RETRIES_COUNT", 3),
+				RetryTimeout: time.Second * time.Duration(
+					loadenv.GetEnvAsInt("TICKETS_RETRIES_TIMEOUT", 1),
+				),
+			},
 		},
 		Tracing: TracingConfig{
 			Server: tracing.Config{
@@ -143,6 +159,56 @@ func New() Config {
 							},
 						},
 					},
+					Toys: tracing.SpanConfig{
+						Opts: []trace.SpanStartOption{
+							trace.WithAttributes(
+								attribute.String("Environment", loadenv.GetEnv("ENVIRONMENT", "local")),
+							),
+						},
+						Events: tracing.SpanEventsConfig{
+							Start: tracing.SpanEventConfig{
+								Name: "Calling gRPC Toys client",
+								Opts: []trace.EventOption{
+									trace.WithAttributes(
+										attribute.String("Environment", loadenv.GetEnv("ENVIRONMENT", "local")),
+									),
+								},
+							},
+							End: tracing.SpanEventConfig{
+								Name: "Received response from gRPC Toys client",
+								Opts: []trace.EventOption{
+									trace.WithAttributes(
+										attribute.String("Environment", loadenv.GetEnv("ENVIRONMENT", "local")),
+									),
+								},
+							},
+						},
+					},
+					Tickets: tracing.SpanConfig{
+						Opts: []trace.SpanStartOption{
+							trace.WithAttributes(
+								attribute.String("Environment", loadenv.GetEnv("ENVIRONMENT", "local")),
+							),
+						},
+						Events: tracing.SpanEventsConfig{
+							Start: tracing.SpanEventConfig{
+								Name: "Calling gRPC Tickets client",
+								Opts: []trace.EventOption{
+									trace.WithAttributes(
+										attribute.String("Environment", loadenv.GetEnv("ENVIRONMENT", "local")),
+									),
+								},
+							},
+							End: tracing.SpanEventConfig{
+								Name: "Received response from gRPC Tickets client",
+								Opts: []trace.EventOption{
+									trace.WithAttributes(
+										attribute.String("Environment", loadenv.GetEnv("ENVIRONMENT", "local")),
+									),
+								},
+							},
+						},
+					},
 				},
 				Handlers: SpanHandlers{
 					VerifyEmail: tracing.SpanConfig{
@@ -195,6 +261,56 @@ func New() Config {
 							},
 						},
 					},
+					UpdateTicket: tracing.SpanConfig{
+						Opts: []trace.SpanStartOption{
+							trace.WithAttributes(
+								attribute.String("Environment", loadenv.GetEnv("ENVIRONMENT", "local")),
+							),
+						},
+						Events: tracing.SpanEventsConfig{
+							Start: tracing.SpanEventConfig{
+								Name: "Calling update-ticket worker handler",
+								Opts: []trace.EventOption{
+									trace.WithAttributes(
+										attribute.String("Environment", loadenv.GetEnv("ENVIRONMENT", "local")),
+									),
+								},
+							},
+							End: tracing.SpanEventConfig{
+								Name: "Received response from update-ticket worker handler",
+								Opts: []trace.EventOption{
+									trace.WithAttributes(
+										attribute.String("Environment", loadenv.GetEnv("ENVIRONMENT", "local")),
+									),
+								},
+							},
+						},
+					},
+					DeleteTicket: tracing.SpanConfig{
+						Opts: []trace.SpanStartOption{
+							trace.WithAttributes(
+								attribute.String("Environment", loadenv.GetEnv("ENVIRONMENT", "local")),
+							),
+						},
+						Events: tracing.SpanEventsConfig{
+							Start: tracing.SpanEventConfig{
+								Name: "Calling delete-ticket worker handler",
+								Opts: []trace.EventOption{
+									trace.WithAttributes(
+										attribute.String("Environment", loadenv.GetEnv("ENVIRONMENT", "local")),
+									),
+								},
+							},
+							End: tracing.SpanEventConfig{
+								Name: "Received response from delete-ticket worker handler",
+								Opts: []trace.EventOption{
+									trace.WithAttributes(
+										attribute.String("Environment", loadenv.GetEnv("ENVIRONMENT", "local")),
+									),
+								},
+							},
+						},
+					},
 				},
 				Senders: SpanSenders{
 					Email: tracing.SpanConfig{
@@ -236,6 +352,8 @@ func New() Config {
 			Subjects: NATSSubjects{
 				VerifyEmail:    loadenv.GetEnv("NATS_VERIFY_EMAIL_SUBJECT", "verify-email"),
 				ForgetPassword: loadenv.GetEnv("NATS_FORGET_PASSWORD_SUBJECT", "forget-password"),
+				UpdateTicket:   loadenv.GetEnv("NATS_UPDATE_TICKET_SUBJECT", "update-ticket"),
+				DeleteTicket:   loadenv.GetEnv("NATS_DELETE_TICKET_SUBJECT", "delete-ticket"),
 			},
 			Workers: NATSWorkers{
 				VerifyEmail: NATSWorker{
@@ -243,6 +361,12 @@ func New() Config {
 				},
 				ForgetPassword: NATSWorker{
 					Name: loadenv.GetEnv("NATS_FORGET_PASSWORD_WORKER_NAME", "forget-password-worker"),
+				},
+				UpdateTicket: NATSWorker{
+					Name: loadenv.GetEnv("NATS_UPDATE_TICKET_WORKER_NAME", "update-ticket-worker"),
+				},
+				DeleteTicket: NATSWorker{
+					Name: loadenv.GetEnv("NATS_DELETE_TICKET_WORKER_NAME", "delete-ticket-worker"),
 				},
 			},
 		},
@@ -255,6 +379,8 @@ func New() Config {
 			},
 			VerifyEmailURL:    loadenv.GetEnv("EMAIL_VERIFY_URL", "http://localhost:8090/sso/verify-email"),
 			ForgetPasswordURL: loadenv.GetEnv("FORGET_PASSWORD_URL", "http://localhost:8090/sso/login"),
+			UpdateTicketURL:   loadenv.GetEnv("UPDATE_TICKET_URL", "http://localhost:8090/tickets"),
+			DeleteTicketURL:   loadenv.GetEnv("UPDATE_TICKET_URL", "http://localhost:8090/users"),
 		},
 	}
 }
@@ -267,7 +393,9 @@ type ClientConfig struct {
 }
 
 type ClientsConfig struct {
-	SSO ClientConfig
+	SSO     ClientConfig
+	Toys    ClientConfig
+	Tickets ClientConfig
 }
 
 type HTTPConfig struct {
@@ -291,6 +419,8 @@ type SpansConfig struct {
 type SpanHandlers struct {
 	VerifyEmail    tracing.SpanConfig
 	ForgetPassword tracing.SpanConfig
+	UpdateTicket   tracing.SpanConfig
+	DeleteTicket   tracing.SpanConfig
 }
 
 type SpanSenders struct {
@@ -302,7 +432,9 @@ type SpanRepositories struct {
 }
 
 type SpanClients struct {
-	SSO tracing.SpanConfig
+	SSO     tracing.SpanConfig
+	Toys    tracing.SpanConfig
+	Tickets tracing.SpanConfig
 }
 
 type NATSConfig struct {
@@ -316,11 +448,15 @@ type NATSConfig struct {
 type NATSSubjects struct {
 	VerifyEmail    string
 	ForgetPassword string
+	UpdateTicket   string
+	DeleteTicket   string
 }
 
 type NATSWorkers struct {
 	VerifyEmail    NATSWorker
 	ForgetPassword NATSWorker
+	UpdateTicket   NATSWorker
+	DeleteTicket   NATSWorker
 }
 
 type NATSWorker struct {
@@ -331,6 +467,8 @@ type EmailConfig struct {
 	SMTP              SMTPConfig
 	VerifyEmailURL    string
 	ForgetPasswordURL string
+	UpdateTicketURL   string
+	DeleteTicketURL   string
 }
 
 type SMTPConfig struct {

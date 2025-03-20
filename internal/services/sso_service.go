@@ -44,3 +44,17 @@ func (service *SsoService) GetUserByID(ctx context.Context, id uint64) (*entitie
 
 	return user, err
 }
+
+func (service *SsoService) GetUserByEmail(ctx context.Context, email string) (*entities.User, error) {
+	user, err := service.ssoRepository.GetUserByEmail(ctx, email)
+	if err != nil {
+		logging.LogErrorContext(
+			ctx,
+			service.logger,
+			fmt.Sprintf("Error occurred while trying to get User with Email=%s", email),
+			err,
+		)
+	}
+
+	return user, err
+}

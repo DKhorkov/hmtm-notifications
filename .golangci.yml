@@ -370,7 +370,19 @@ issues:
     - path: "internal/repositories/sso_repository.go"
       linters:
         - protogetter # to be able using optional fields like *string
+    - path: "internal/repositories/toys_repository.go"
+      linters:
+        - protogetter # to be able using optional fields like *string
+    - path: "internal/repositories/tickets_repository.go"
+      linters:
+        - protogetter # to be able using optional fields like *string
     - path: "internal/clients/sso/grpc/client.go"
+      linters:
+        - gosec
+    - path: "internal/clients/toys/grpc/client.go"
+      linters:
+        - gosec
+    - path: "internal/clients/tickets/grpc/client.go"
       linters:
         - gosec
     - path: "internal/senders/email.go"
@@ -381,3 +393,22 @@ issues:
     - path: "cmd/server/server.go"
       linters:
         - cyclop
+        - gocognit
+    - path: "internal/interfaces/usecases.go"
+      linters:
+        - lll
+    - path: "internal/usecases/usecases.go"
+      linters:
+        - govet
+    - path: "internal/workers/handlers/builders/verify_email.go"
+      linters:
+        - dupl
+    - path: "internal/workers/handlers/builders/update_ticket.go"
+      linters:
+        - dupl
+    - path: "cmd/publishers/deleteticket/delete_ticket.go"
+      linters:
+        - mnd
+    - path: "cmd/publishers/updateticket/update_ticket.go"
+      linters:
+        - mnd

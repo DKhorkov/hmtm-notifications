@@ -13,6 +13,8 @@ import (
 
 	"github.com/DKhorkov/hmtm-notifications/internal/app"
 	ssogrpcclient "github.com/DKhorkov/hmtm-notifications/internal/clients/sso/grpc"
+	ticketsgrpcclient "github.com/DKhorkov/hmtm-notifications/internal/clients/tickets/grpc"
+	toysgrpcclient "github.com/DKhorkov/hmtm-notifications/internal/clients/toys/grpc"
 	"github.com/DKhorkov/hmtm-notifications/internal/config"
 	"github.com/DKhorkov/hmtm-notifications/internal/contentbuilders"
 	grpccontroller "github.com/DKhorkov/hmtm-notifications/internal/controllers/grpc"
@@ -76,9 +78,49 @@ func main() {
 		panic(err)
 	}
 
+	toysClient, err := toysgrpcclient.New(
+		settings.Clients.Toys.Host,
+		settings.Clients.Toys.Port,
+		settings.Clients.Toys.RetriesCount,
+		settings.Clients.Toys.RetryTimeout,
+		logger,
+		traceProvider,
+		settings.Tracing.Spans.Clients.Toys,
+	)
+
+	if err != nil {
+		panic(err)
+	}
+
+	ticketsClient, err := ticketsgrpcclient.New(
+		settings.Clients.Tickets.Host,
+		settings.Clients.Tickets.Port,
+		settings.Clients.Tickets.RetriesCount,
+		settings.Clients.Tickets.RetryTimeout,
+		logger,
+		traceProvider,
+		settings.Tracing.Spans.Clients.Tickets,
+	)
+
+	if err != nil {
+		panic(err)
+	}
+
 	ssoRepository := repositories.NewSsoRepository(ssoClient)
 	ssoService := services.NewSsoService(
 		ssoRepository,
+		logger,
+	)
+
+	toysRepository := repositories.NewToysRepository(toysClient)
+	toysService := services.NewToysService(
+		toysRepository,
+		logger,
+	)
+
+	ticketsRepository := repositories.NewTicketsRepository(ticketsClient)
+	ticketsService := services.NewTicketsService(
+		ticketsRepository,
 		logger,
 	)
 
@@ -101,6 +143,12 @@ func main() {
 		ForgetPassword: contentbuilders.NewForgetPasswordContentBuilder(
 			settings.Email.ForgetPasswordURL,
 		),
+		UpdateTicket: contentbuilders.NewUpdateTicketContentBuilder(
+			settings.Email.UpdateTicketURL,
+		),
+		DeleteTicket: contentbuilders.NewDeleteTicketContentBuilder(
+			settings.Email.DeleteTicketURL,
+		),
 	}
 
 	communicationsSenders := interfaces.Senders{
@@ -114,6 +162,8 @@ func main() {
 	useCases := usecases.New(
 		emailsService,
 		ssoService,
+		toysService,
+		ticketsService,
 		contentBuilders,
 		communicationsSenders,
 	)
@@ -190,6 +240,74 @@ func main() {
 			logging.LogError(
 				logger,
 				fmt.Sprintf("Error shutting down \"%s\" worker", settings.NATS.Workers.ForgetPassword.Name),
+				err,
+			)
+		}
+	}()
+
+	updateTicketWorker, err := customnats.NewWorker(
+		settings.NATS.ClientURL,
+		settings.NATS.Subjects.UpdateTicket,
+		customnats.WithGoroutinesPoolSize(settings.NATS.GoroutinesPoolSize),
+		customnats.WithMessageChannelBufferSize(settings.NATS.MessageChannelBufferSize),
+		customnats.WithNatsOptions(nats.Name(settings.NATS.Workers.UpdateTicket.Name)),
+		customnats.WithMessageHandler(
+			builders.NewUpdateTicketBuilder(
+				useCases,
+				traceProvider,
+				settings.Tracing.Spans.Handlers.UpdateTicket,
+				logger,
+			).MessageHandler(),
+		),
+	)
+
+	if err != nil {
+		panic(err)
+	}
+
+	if err = updateTicketWorker.Run(); err != nil {
+		panic(err)
+	}
+
+	defer func() {
+		if err = updateTicketWorker.Stop(); err != nil {
+			logging.LogError(
+				logger,
+				fmt.Sprintf("Error shutting down \"%s\" worker", settings.NATS.Workers.UpdateTicket.Name),
+				err,
+			)
+		}
+	}()
+
+	deleteTicketWorker, err := customnats.NewWorker(
+		settings.NATS.ClientURL,
+		settings.NATS.Subjects.DeleteTicket,
+		customnats.WithGoroutinesPoolSize(settings.NATS.GoroutinesPoolSize),
+		customnats.WithMessageChannelBufferSize(settings.NATS.MessageChannelBufferSize),
+		customnats.WithNatsOptions(nats.Name(settings.NATS.Workers.DeleteTicket.Name)),
+		customnats.WithMessageHandler(
+			builders.NewDeleteTicketBuilder(
+				useCases,
+				traceProvider,
+				settings.Tracing.Spans.Handlers.DeleteTicket,
+				logger,
+			).MessageHandler(),
+		),
+	)
+
+	if err != nil {
+		panic(err)
+	}
+
+	if err = deleteTicketWorker.Run(); err != nil {
+		panic(err)
+	}
+
+	defer func() {
+		if err = deleteTicketWorker.Stop(); err != nil {
+			logging.LogError(
+				logger,
+				fmt.Sprintf("Error shutting down \"%s\" worker", settings.NATS.Workers.DeleteTicket.Name),
 				err,
 			)
 		}

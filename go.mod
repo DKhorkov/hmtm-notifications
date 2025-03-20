@@ -4,6 +4,8 @@ go 1.23.4
 
 require (
 	github.com/DKhorkov/hmtm-sso v1.4.1
+	github.com/DKhorkov/hmtm-tickets v1.1.0
+	github.com/DKhorkov/hmtm-toys v1.1.0
 	github.com/DKhorkov/libs v1.7.0
 	github.com/Masterminds/squirrel v1.5.4
 	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.2.0

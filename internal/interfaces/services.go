@@ -7,3 +7,11 @@ type EmailsService interface {
 type SsoService interface {
 	SsoRepository
 }
+
+type TicketsService interface {
+	TicketsRepository
+}
+
+type ToysService interface {
+	ToysRepository
+}

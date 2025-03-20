@@ -1,4 +1,4 @@
-package ssogrpcclient
+package toysgrpcclient
 
 import (
 	"fmt"
@@ -10,16 +10,17 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials/insecure"
 
+	"github.com/DKhorkov/hmtm-toys/api/protobuf/generated/go/toys"
 	customgrpc "github.com/DKhorkov/libs/grpc/interceptors"
 	"github.com/DKhorkov/libs/logging"
 	"github.com/DKhorkov/libs/tracing"
-
-	"github.com/DKhorkov/hmtm-sso/api/protobuf/generated/go/sso"
 )
 
 type Client struct {
-	sso.AuthServiceClient
-	sso.UsersServiceClient
+	toys.ToysServiceClient
+	toys.TagsServiceClient
+	toys.MastersServiceClient
+	toys.CategoriesServiceClient
 }
 
 func New(
@@ -65,7 +66,7 @@ func New(
 	if err != nil {
 		logging.LogError(
 			logger,
-			"Failed to create SSO gRPC client",
+			"Failed to create Toys gRPC client",
 			err,
 		)
 
@@ -73,7 +74,9 @@ func New(
 	}
 
 	return &Client{
-		AuthServiceClient:  sso.NewAuthServiceClient(clientConnection),
-		UsersServiceClient: sso.NewUsersServiceClient(clientConnection),
+		ToysServiceClient:       toys.NewToysServiceClient(clientConnection),
+		TagsServiceClient:       toys.NewTagsServiceClient(clientConnection),
+		MastersServiceClient:    toys.NewMastersServiceClient(clientConnection),
+		CategoriesServiceClient: toys.NewCategoriesServiceClient(clientConnection),
 	}, nil
 }
