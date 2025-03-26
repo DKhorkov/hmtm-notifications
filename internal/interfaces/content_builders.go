@@ -29,5 +29,5 @@ type UpdateTicketContentBuilder interface {
 
 type DeleteTicketContentBuilder interface {
 	Subject(ticketData dto.DeleteTicketDTO) string
-	Body(ticketData dto.DeleteTicketDTO, ticketOwner entities.User, respondOwner entities.User) string
+	Body(ticketData dto.DeleteTicketDTO, ticketOwner, respondOwner entities.User) string
 }

@@ -4,11 +4,11 @@ import (
 	"context"
 	"sync"
 
-	sq "github.com/Masterminds/squirrel"
-
 	"github.com/DKhorkov/libs/db"
 	"github.com/DKhorkov/libs/logging"
 	"github.com/DKhorkov/libs/tracing"
+
+	sq "github.com/Masterminds/squirrel"
 
 	"github.com/DKhorkov/hmtm-notifications/internal/entities"
 )
@@ -70,7 +70,6 @@ func (repo *EmailsRepository) GetUserCommunications(
 		Where(sq.Eq{userIDColumnName: userID}).
 		PlaceholderFormat(sq.Dollar).
 		ToSql()
-
 	if err != nil {
 		return nil, err
 	}
@@ -84,7 +83,6 @@ func (repo *EmailsRepository) GetUserCommunications(
 		stmt,
 		params...,
 	)
-
 	if err != nil {
 		return nil, err
 	}
@@ -119,7 +117,10 @@ func (repo *EmailsRepository) GetUserCommunications(
 	return emails, nil
 }
 
-func (repo *EmailsRepository) SaveCommunication(ctx context.Context, email entities.Email) (uint64, error) {
+func (repo *EmailsRepository) SaveCommunication(
+	ctx context.Context,
+	email entities.Email,
+) (uint64, error) {
 	ctx, span := repo.traceProvider.Span(ctx, tracing.CallerName(tracing.DefaultSkipLevel))
 	defer span.End()
 
@@ -150,7 +151,6 @@ func (repo *EmailsRepository) SaveCommunication(ctx context.Context, email entit
 		Suffix(returningIDSuffix).
 		PlaceholderFormat(sq.Dollar). // pq postgres driver works only with $ placeholders
 		ToSql()
-
 	if err != nil {
 		return 0, err
 	}

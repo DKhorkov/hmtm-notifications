@@ -7,5 +7,5 @@ type Senders struct {
 }
 
 type EmailSender interface {
-	Send(ctx context.Context, subject string, body string, recipients []string) error
+	Send(ctx context.Context, subject, body string, recipients []string) error
 }

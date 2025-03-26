@@ -4,12 +4,12 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/DKhorkov/libs/logging"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	customgrpc "github.com/DKhorkov/libs/grpc"
-	"github.com/DKhorkov/libs/logging"
 
 	"github.com/DKhorkov/hmtm-notifications/api/protobuf/generated/go/notifications"
 	"github.com/DKhorkov/hmtm-notifications/internal/interfaces"
@@ -17,7 +17,10 @@ import (
 
 // RegisterServer handler (serverAPI) connects EmailsServer to gRPC server:.
 func RegisterServer(gRPCServer *grpc.Server, useCases interfaces.UseCases, logger logging.Logger) {
-	notifications.RegisterEmailsServiceServer(gRPCServer, &ServerAPI{useCases: useCases, logger: logger})
+	notifications.RegisterEmailsServiceServer(
+		gRPCServer,
+		&ServerAPI{useCases: useCases, logger: logger},
+	)
 }
 
 type ServerAPI struct {
@@ -36,7 +39,10 @@ func (api ServerAPI) GetUserEmailCommunications(
 		logging.LogErrorContext(
 			ctx,
 			api.logger,
-			fmt.Sprintf("Error occurred while trying to get Email Communications for User with ID=%d", in.GetUserID()),
+			fmt.Sprintf(
+				"Error occurred while trying to get Email Communications for User with ID=%d",
+				in.GetUserID(),
+			),
 			err,
 		)
 

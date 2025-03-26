@@ -4,10 +4,9 @@ import (
 	"context"
 	"encoding/json"
 
-	"github.com/nats-io/nats.go"
-
 	"github.com/DKhorkov/libs/logging"
 	"github.com/DKhorkov/libs/tracing"
+	"github.com/nats-io/nats.go"
 
 	"github.com/DKhorkov/hmtm-notifications/dto"
 	"github.com/DKhorkov/hmtm-notifications/internal/interfaces"
@@ -38,7 +37,10 @@ type DeleteTicketBuilder struct {
 
 func (b *DeleteTicketBuilder) MessageHandler() handlers.MessageHandler {
 	return func(message *nats.Msg) {
-		ctx, span := b.traceProvider.Span(context.Background(), tracing.CallerName(tracing.DefaultSkipLevel))
+		ctx, span := b.traceProvider.Span(
+			context.Background(),
+			tracing.CallerName(tracing.DefaultSkipLevel),
+		)
 		defer span.End()
 
 		span.AddEvent(b.spanConfig.Events.Start.Name, b.spanConfig.Events.Start.Opts...)

@@ -25,7 +25,10 @@ type TicketsService struct {
 	logger            logging.Logger
 }
 
-func (service *TicketsService) GetTicketByID(ctx context.Context, id uint64) (*entities.RawTicket, error) {
+func (service *TicketsService) GetTicketByID(
+	ctx context.Context,
+	id uint64,
+) (*entities.RawTicket, error) {
 	ticket, err := service.ticketsRepository.GetTicketByID(ctx, id)
 	if err != nil {
 		logging.LogErrorContext(
@@ -42,13 +45,21 @@ func (service *TicketsService) GetTicketByID(ctx context.Context, id uint64) (*e
 func (service *TicketsService) GetAllTickets(ctx context.Context) ([]entities.RawTicket, error) {
 	tickets, err := service.ticketsRepository.GetAllTickets(ctx)
 	if err != nil {
-		logging.LogErrorContext(ctx, service.logger, "Error occurred while trying to get all Tickets", err)
+		logging.LogErrorContext(
+			ctx,
+			service.logger,
+			"Error occurred while trying to get all Tickets",
+			err,
+		)
 	}
 
 	return tickets, err
 }
 
-func (service *TicketsService) GetUserTickets(ctx context.Context, userID uint64) ([]entities.RawTicket, error) {
+func (service *TicketsService) GetUserTickets(
+	ctx context.Context,
+	userID uint64,
+) ([]entities.RawTicket, error) {
 	tickets, err := service.ticketsRepository.GetUserTickets(ctx, userID)
 	if err != nil {
 		logging.LogErrorContext(
@@ -62,7 +73,10 @@ func (service *TicketsService) GetUserTickets(ctx context.Context, userID uint64
 	return tickets, err
 }
 
-func (service *TicketsService) GetRespondByID(ctx context.Context, id uint64) (*entities.Respond, error) {
+func (service *TicketsService) GetRespondByID(
+	ctx context.Context,
+	id uint64,
+) (*entities.Respond, error) {
 	respond, err := service.ticketsRepository.GetRespondByID(ctx, id)
 	if err != nil {
 		logging.LogErrorContext(
@@ -85,7 +99,10 @@ func (service *TicketsService) GetTicketResponds(
 		logging.LogErrorContext(
 			ctx,
 			service.logger,
-			fmt.Sprintf("Error occurred while trying to get Responds for Ticket with ID=%d", ticketID),
+			fmt.Sprintf(
+				"Error occurred while trying to get Responds for Ticket with ID=%d",
+				ticketID,
+			),
 			err,
 		)
 	}
@@ -93,7 +110,10 @@ func (service *TicketsService) GetTicketResponds(
 	return responds, err
 }
 
-func (service *TicketsService) GetUserResponds(ctx context.Context, userID uint64) ([]entities.Respond, error) {
+func (service *TicketsService) GetUserResponds(
+	ctx context.Context,
+	userID uint64,
+) ([]entities.Respond, error) {
 	responds, err := service.ticketsRepository.GetUserResponds(ctx, userID)
 	if err != nil {
 		logging.LogErrorContext(

@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"time"
 
+	"github.com/DKhorkov/libs/pointers"
 	"github.com/nats-io/nats.go"
 
 	customnats "github.com/DKhorkov/libs/nats"
-	"github.com/DKhorkov/libs/pointers"
 
 	"github.com/DKhorkov/hmtm-notifications/dto"
 	"github.com/DKhorkov/hmtm-notifications/internal/config"
@@ -20,7 +20,6 @@ func main() {
 		settings.NATS.ClientURL,
 		nats.Name("hmtm-notifications-test"),
 	)
-
 	if err != nil {
 		panic(err)
 	}

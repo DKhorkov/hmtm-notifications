@@ -21,7 +21,7 @@ var (
 	userID uint64 = 1
 )
 
-func TestEmailsServiceGetUserEmailCommunications(t *testing.T) {
+func TestEmailsService_GetUserEmailCommunications(t *testing.T) {
 	now := time.Now()
 	testCases := []struct {
 		name          string

@@ -25,19 +25,10 @@ type ToysService struct {
 func (service *ToysService) GetAllToys(ctx context.Context) ([]entities.Toy, error) {
 	toys, err := service.toysRepository.GetAllToys(ctx)
 	if err != nil {
-		logging.LogErrorContext(ctx, service.logger, "Error occurred while trying to get all Toys", err)
-	}
-
-	return toys, err
-}
-
-func (service *ToysService) GetMasterToys(ctx context.Context, masterID uint64) ([]entities.Toy, error) {
-	toys, err := service.toysRepository.GetMasterToys(ctx, masterID)
-	if err != nil {
 		logging.LogErrorContext(
 			ctx,
 			service.logger,
-			fmt.Sprintf("Error occurred while trying to get all Toys for Master with ID=%d", masterID),
+			"Error occurred while trying to get all Toys",
 			err,
 		)
 	}
@@ -45,7 +36,30 @@ func (service *ToysService) GetMasterToys(ctx context.Context, masterID uint64) 
 	return toys, err
 }
 
-func (service *ToysService) GetUserToys(ctx context.Context, userID uint64) ([]entities.Toy, error) {
+func (service *ToysService) GetMasterToys(
+	ctx context.Context,
+	masterID uint64,
+) ([]entities.Toy, error) {
+	toys, err := service.toysRepository.GetMasterToys(ctx, masterID)
+	if err != nil {
+		logging.LogErrorContext(
+			ctx,
+			service.logger,
+			fmt.Sprintf(
+				"Error occurred while trying to get all Toys for Master with ID=%d",
+				masterID,
+			),
+			err,
+		)
+	}
+
+	return toys, err
+}
+
+func (service *ToysService) GetUserToys(
+	ctx context.Context,
+	userID uint64,
+) ([]entities.Toy, error) {
 	toys, err := service.toysRepository.GetUserToys(ctx, userID)
 	if err != nil {
 		logging.LogErrorContext(
@@ -76,13 +90,21 @@ func (service *ToysService) GetToyByID(ctx context.Context, id uint64) (*entitie
 func (service *ToysService) GetAllMasters(ctx context.Context) ([]entities.Master, error) {
 	masters, err := service.toysRepository.GetAllMasters(ctx)
 	if err != nil {
-		logging.LogErrorContext(ctx, service.logger, "Error occurred while trying to get all Masters", err)
+		logging.LogErrorContext(
+			ctx,
+			service.logger,
+			"Error occurred while trying to get all Masters",
+			err,
+		)
 	}
 
 	return masters, err
 }
 
-func (service *ToysService) GetMasterByID(ctx context.Context, id uint64) (*entities.Master, error) {
+func (service *ToysService) GetMasterByID(
+	ctx context.Context,
+	id uint64,
+) (*entities.Master, error) {
 	master, err := service.toysRepository.GetMasterByID(ctx, id)
 	if err != nil {
 		logging.LogErrorContext(
@@ -99,13 +121,21 @@ func (service *ToysService) GetMasterByID(ctx context.Context, id uint64) (*enti
 func (service *ToysService) GetAllCategories(ctx context.Context) ([]entities.Category, error) {
 	categories, err := service.toysRepository.GetAllCategories(ctx)
 	if err != nil {
-		logging.LogErrorContext(ctx, service.logger, "Error occurred while trying to get all Categories", err)
+		logging.LogErrorContext(
+			ctx,
+			service.logger,
+			"Error occurred while trying to get all Categories",
+			err,
+		)
 	}
 
 	return categories, err
 }
 
-func (service *ToysService) GetCategoryByID(ctx context.Context, id uint32) (*entities.Category, error) {
+func (service *ToysService) GetCategoryByID(
+	ctx context.Context,
+	id uint32,
+) (*entities.Category, error) {
 	category, err := service.toysRepository.GetCategoryByID(ctx, id)
 	if err != nil {
 		logging.LogErrorContext(
@@ -122,7 +152,12 @@ func (service *ToysService) GetCategoryByID(ctx context.Context, id uint32) (*en
 func (service *ToysService) GetAllTags(ctx context.Context) ([]entities.Tag, error) {
 	tags, err := service.toysRepository.GetAllTags(ctx)
 	if err != nil {
-		logging.LogErrorContext(ctx, service.logger, "Error occurred while trying to get all Tags", err)
+		logging.LogErrorContext(
+			ctx,
+			service.logger,
+			"Error occurred while trying to get all Tags",
+			err,
+		)
 	}
 
 	return tags, err
@@ -142,7 +177,10 @@ func (service *ToysService) GetTagByID(ctx context.Context, id uint32) (*entitie
 	return tag, err
 }
 
-func (service *ToysService) GetMasterByUser(ctx context.Context, userID uint64) (*entities.Master, error) {
+func (service *ToysService) GetMasterByUser(
+	ctx context.Context,
+	userID uint64,
+) (*entities.Master, error) {
 	master, err := service.toysRepository.GetMasterByUser(ctx, userID)
 	if err != nil {
 		logging.LogErrorContext(

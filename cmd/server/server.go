@@ -4,12 +4,12 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/nats-io/nats.go"
-
 	"github.com/DKhorkov/libs/db"
 	"github.com/DKhorkov/libs/logging"
-	customnats "github.com/DKhorkov/libs/nats"
 	"github.com/DKhorkov/libs/tracing"
+	"github.com/nats-io/nats.go"
+
+	customnats "github.com/DKhorkov/libs/nats"
 
 	"github.com/DKhorkov/hmtm-notifications/internal/app"
 	ssogrpcclient "github.com/DKhorkov/hmtm-notifications/internal/clients/sso/grpc"
@@ -42,7 +42,6 @@ func main() {
 		db.WithMaxConnectionLifetime(settings.Database.Pool.MaxConnectionLifetime),
 		db.WithMaxConnectionIdleTime(settings.Database.Pool.MaxConnectionIdleTime),
 	)
-
 	if err != nil {
 		panic(err)
 	}
@@ -73,7 +72,6 @@ func main() {
 		traceProvider,
 		settings.Tracing.Spans.Clients.SSO,
 	)
-
 	if err != nil {
 		panic(err)
 	}
@@ -87,7 +85,6 @@ func main() {
 		traceProvider,
 		settings.Tracing.Spans.Clients.Toys,
 	)
-
 	if err != nil {
 		panic(err)
 	}
@@ -101,7 +98,6 @@ func main() {
 		traceProvider,
 		settings.Tracing.Spans.Clients.Tickets,
 	)
-
 	if err != nil {
 		panic(err)
 	}
@@ -192,7 +188,6 @@ func main() {
 			).MessageHandler(),
 		),
 	)
-
 	if err != nil {
 		panic(err)
 	}
@@ -205,7 +200,10 @@ func main() {
 		if err = verifyEmailWorker.Stop(); err != nil {
 			logging.LogError(
 				logger,
-				fmt.Sprintf("Error shutting down \"%s\" worker", settings.NATS.Workers.VerifyEmail.Name),
+				fmt.Sprintf(
+					"Error shutting down \"%s\" worker",
+					settings.NATS.Workers.VerifyEmail.Name,
+				),
 				err,
 			)
 		}
@@ -226,7 +224,6 @@ func main() {
 			).MessageHandler(),
 		),
 	)
-
 	if err != nil {
 		panic(err)
 	}
@@ -239,7 +236,10 @@ func main() {
 		if err = forgetPasswordWorker.Stop(); err != nil {
 			logging.LogError(
 				logger,
-				fmt.Sprintf("Error shutting down \"%s\" worker", settings.NATS.Workers.ForgetPassword.Name),
+				fmt.Sprintf(
+					"Error shutting down \"%s\" worker",
+					settings.NATS.Workers.ForgetPassword.Name,
+				),
 				err,
 			)
 		}
@@ -260,7 +260,6 @@ func main() {
 			).MessageHandler(),
 		),
 	)
-
 	if err != nil {
 		panic(err)
 	}
@@ -273,7 +272,10 @@ func main() {
 		if err = updateTicketWorker.Stop(); err != nil {
 			logging.LogError(
 				logger,
-				fmt.Sprintf("Error shutting down \"%s\" worker", settings.NATS.Workers.UpdateTicket.Name),
+				fmt.Sprintf(
+					"Error shutting down \"%s\" worker",
+					settings.NATS.Workers.UpdateTicket.Name,
+				),
 				err,
 			)
 		}
@@ -294,7 +296,6 @@ func main() {
 			).MessageHandler(),
 		),
 	)
-
 	if err != nil {
 		panic(err)
 	}
@@ -307,7 +308,10 @@ func main() {
 		if err = deleteTicketWorker.Stop(); err != nil {
 			logging.LogError(
 				logger,
-				fmt.Sprintf("Error shutting down \"%s\" worker", settings.NATS.Workers.DeleteTicket.Name),
+				fmt.Sprintf(
+					"Error shutting down \"%s\" worker",
+					settings.NATS.Workers.DeleteTicket.Name,
+				),
 				err,
 			)
 		}

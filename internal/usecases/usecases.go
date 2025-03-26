@@ -100,7 +100,10 @@ func (useCases *UseCases) SendForgetPasswordEmailCommunication(
 	return useCases.emailsService.SaveCommunication(ctx, emailCommunication)
 }
 
-func (useCases *UseCases) SendUpdateTicketEmailCommunication(ctx context.Context, ticketID uint64) ([]uint64, error) {
+func (useCases *UseCases) SendUpdateTicketEmailCommunication(
+	ctx context.Context,
+	ticketID uint64,
+) ([]uint64, error) {
 	rawTicket, err := useCases.ticketsService.GetTicketByID(ctx, ticketID)
 	if err != nil {
 		return nil, err
@@ -181,10 +184,14 @@ func (useCases *UseCases) SendDeleteTicketEmailCommunication(
 		}
 
 		emailCommunication := entities.Email{
-			UserID:  respondOwner.ID,
-			Email:   respondOwner.Email,
-			Content: useCases.contentBuilders.DeleteTicket.Body(ticketData, *ticketOwner, *respondOwner),
-			SentAt:  time.Now().UTC(),
+			UserID: respondOwner.ID,
+			Email:  respondOwner.Email,
+			Content: useCases.contentBuilders.DeleteTicket.Body(
+				ticketData,
+				*ticketOwner,
+				*respondOwner,
+			),
+			SentAt: time.Now().UTC(),
 		}
 
 		emailID, err := useCases.emailsService.SaveCommunication(ctx, emailCommunication)

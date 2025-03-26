@@ -3,9 +3,8 @@ package senders
 import (
 	"context"
 
-	"gopkg.in/gomail.v2"
-
 	"github.com/DKhorkov/libs/tracing"
+	"gopkg.in/gomail.v2"
 
 	"github.com/DKhorkov/hmtm-notifications/internal/config"
 )
@@ -28,7 +27,7 @@ type EmailSender struct {
 	spanConfig    tracing.SpanConfig
 }
 
-func (s *EmailSender) Send(ctx context.Context, subject string, body string, recipients []string) error {
+func (s *EmailSender) Send(ctx context.Context, subject, body string, recipients []string) error {
 	ctx, span := s.traceProvider.Span(ctx, tracing.CallerName(tracing.DefaultSkipLevel))
 	defer span.End()
 

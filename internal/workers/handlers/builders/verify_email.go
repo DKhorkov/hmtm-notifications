@@ -5,10 +5,9 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/nats-io/nats.go"
-
 	"github.com/DKhorkov/libs/logging"
 	"github.com/DKhorkov/libs/tracing"
+	"github.com/nats-io/nats.go"
 
 	"github.com/DKhorkov/hmtm-notifications/dto"
 	"github.com/DKhorkov/hmtm-notifications/internal/interfaces"
@@ -39,7 +38,10 @@ type VerifyEmailBuilder struct {
 
 func (b *VerifyEmailBuilder) MessageHandler() handlers.MessageHandler {
 	return func(message *nats.Msg) {
-		ctx, span := b.traceProvider.Span(context.Background(), tracing.CallerName(tracing.DefaultSkipLevel))
+		ctx, span := b.traceProvider.Span(
+			context.Background(),
+			tracing.CallerName(tracing.DefaultSkipLevel),
+		)
 		defer span.End()
 
 		span.AddEvent(b.spanConfig.Events.Start.Name, b.spanConfig.Events.Start.Opts...)
@@ -58,7 +60,10 @@ func (b *VerifyEmailBuilder) MessageHandler() handlers.MessageHandler {
 		); err != nil {
 			logging.LogError(
 				b.logger,
-				fmt.Sprintf("Failed to send verify-email message to User with ID=%d ", verifyEmailDTO.UserID),
+				fmt.Sprintf(
+					"Failed to send verify-email message to User with ID=%d ",
+					verifyEmailDTO.UserID,
+				),
 				err,
 			)
 		}
