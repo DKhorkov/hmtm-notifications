@@ -31,6 +31,9 @@ func (service *EmailsService) GetUserCommunications(
 	return service.emailsRepository.GetUserCommunications(ctx, userID)
 }
 
-func (service *EmailsService) SaveCommunication(ctx context.Context, email entities.Email) (uint64, error) {
+func (service *EmailsService) SaveCommunication(
+	ctx context.Context,
+	email entities.Email,
+) (uint64, error) {
 	return service.emailsRepository.SaveCommunication(ctx, email)
 }

@@ -24,7 +24,10 @@ func (b *UpdateTicketContentBuilder) Subject(ticket entities.RawTicket) string {
 	)
 }
 
-func (b *UpdateTicketContentBuilder) Body(ticket entities.RawTicket, respondOwner entities.User) string {
+func (b *UpdateTicketContentBuilder) Body(
+	ticket entities.RawTicket,
+	respondOwner entities.User,
+) string {
 	link := fmt.Sprintf(
 		"%s/%s",
 		b.updateTicketURLBase,

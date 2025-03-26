@@ -19,7 +19,6 @@ func main() {
 		settings.NATS.ClientURL,
 		nats.Name("hmtm-notifications-test"),
 	)
-
 	if err != nil {
 		panic(err)
 	}

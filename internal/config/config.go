@@ -4,13 +4,12 @@ import (
 	"fmt"
 	"time"
 
-	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/trace"
-
 	"github.com/DKhorkov/libs/db"
 	"github.com/DKhorkov/libs/loadenv"
 	"github.com/DKhorkov/libs/logging"
 	"github.com/DKhorkov/libs/tracing"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
 )
 
 func New() Config {
@@ -92,7 +91,10 @@ func New() Config {
 							Name: "Calling handler",
 							Opts: []trace.EventOption{
 								trace.WithAttributes(
-									attribute.String("Environment", loadenv.GetEnv("ENVIRONMENT", "local")),
+									attribute.String(
+										"Environment",
+										loadenv.GetEnv("ENVIRONMENT", "local"),
+									),
 								),
 							},
 						},
@@ -100,7 +102,10 @@ func New() Config {
 							Name: "Received response from handler",
 							Opts: []trace.EventOption{
 								trace.WithAttributes(
-									attribute.String("Environment", loadenv.GetEnv("ENVIRONMENT", "local")),
+									attribute.String(
+										"Environment",
+										loadenv.GetEnv("ENVIRONMENT", "local"),
+									),
 								),
 							},
 						},
@@ -110,7 +115,10 @@ func New() Config {
 					Emails: tracing.SpanConfig{
 						Opts: []trace.SpanStartOption{
 							trace.WithAttributes(
-								attribute.String("Environment", loadenv.GetEnv("ENVIRONMENT", "local")),
+								attribute.String(
+									"Environment",
+									loadenv.GetEnv("ENVIRONMENT", "local"),
+								),
 							),
 						},
 						Events: tracing.SpanEventsConfig{
@@ -118,7 +126,10 @@ func New() Config {
 								Name: "Calling database",
 								Opts: []trace.EventOption{
 									trace.WithAttributes(
-										attribute.String("Environment", loadenv.GetEnv("ENVIRONMENT", "local")),
+										attribute.String(
+											"Environment",
+											loadenv.GetEnv("ENVIRONMENT", "local"),
+										),
 									),
 								},
 							},
@@ -126,7 +137,10 @@ func New() Config {
 								Name: "Received response from database",
 								Opts: []trace.EventOption{
 									trace.WithAttributes(
-										attribute.String("Environment", loadenv.GetEnv("ENVIRONMENT", "local")),
+										attribute.String(
+											"Environment",
+											loadenv.GetEnv("ENVIRONMENT", "local"),
+										),
 									),
 								},
 							},
@@ -137,7 +151,10 @@ func New() Config {
 					SSO: tracing.SpanConfig{
 						Opts: []trace.SpanStartOption{
 							trace.WithAttributes(
-								attribute.String("Environment", loadenv.GetEnv("ENVIRONMENT", "local")),
+								attribute.String(
+									"Environment",
+									loadenv.GetEnv("ENVIRONMENT", "local"),
+								),
 							),
 						},
 						Events: tracing.SpanEventsConfig{
@@ -145,7 +162,10 @@ func New() Config {
 								Name: "Calling gRPC SSO client",
 								Opts: []trace.EventOption{
 									trace.WithAttributes(
-										attribute.String("Environment", loadenv.GetEnv("ENVIRONMENT", "local")),
+										attribute.String(
+											"Environment",
+											loadenv.GetEnv("ENVIRONMENT", "local"),
+										),
 									),
 								},
 							},
@@ -153,7 +173,10 @@ func New() Config {
 								Name: "Received response from gRPC SSO client",
 								Opts: []trace.EventOption{
 									trace.WithAttributes(
-										attribute.String("Environment", loadenv.GetEnv("ENVIRONMENT", "local")),
+										attribute.String(
+											"Environment",
+											loadenv.GetEnv("ENVIRONMENT", "local"),
+										),
 									),
 								},
 							},
@@ -162,7 +185,10 @@ func New() Config {
 					Toys: tracing.SpanConfig{
 						Opts: []trace.SpanStartOption{
 							trace.WithAttributes(
-								attribute.String("Environment", loadenv.GetEnv("ENVIRONMENT", "local")),
+								attribute.String(
+									"Environment",
+									loadenv.GetEnv("ENVIRONMENT", "local"),
+								),
 							),
 						},
 						Events: tracing.SpanEventsConfig{
@@ -170,7 +196,10 @@ func New() Config {
 								Name: "Calling gRPC Toys client",
 								Opts: []trace.EventOption{
 									trace.WithAttributes(
-										attribute.String("Environment", loadenv.GetEnv("ENVIRONMENT", "local")),
+										attribute.String(
+											"Environment",
+											loadenv.GetEnv("ENVIRONMENT", "local"),
+										),
 									),
 								},
 							},
@@ -178,7 +207,10 @@ func New() Config {
 								Name: "Received response from gRPC Toys client",
 								Opts: []trace.EventOption{
 									trace.WithAttributes(
-										attribute.String("Environment", loadenv.GetEnv("ENVIRONMENT", "local")),
+										attribute.String(
+											"Environment",
+											loadenv.GetEnv("ENVIRONMENT", "local"),
+										),
 									),
 								},
 							},
@@ -187,7 +219,10 @@ func New() Config {
 					Tickets: tracing.SpanConfig{
 						Opts: []trace.SpanStartOption{
 							trace.WithAttributes(
-								attribute.String("Environment", loadenv.GetEnv("ENVIRONMENT", "local")),
+								attribute.String(
+									"Environment",
+									loadenv.GetEnv("ENVIRONMENT", "local"),
+								),
 							),
 						},
 						Events: tracing.SpanEventsConfig{
@@ -195,7 +230,10 @@ func New() Config {
 								Name: "Calling gRPC Tickets client",
 								Opts: []trace.EventOption{
 									trace.WithAttributes(
-										attribute.String("Environment", loadenv.GetEnv("ENVIRONMENT", "local")),
+										attribute.String(
+											"Environment",
+											loadenv.GetEnv("ENVIRONMENT", "local"),
+										),
 									),
 								},
 							},
@@ -203,7 +241,10 @@ func New() Config {
 								Name: "Received response from gRPC Tickets client",
 								Opts: []trace.EventOption{
 									trace.WithAttributes(
-										attribute.String("Environment", loadenv.GetEnv("ENVIRONMENT", "local")),
+										attribute.String(
+											"Environment",
+											loadenv.GetEnv("ENVIRONMENT", "local"),
+										),
 									),
 								},
 							},
@@ -214,7 +255,10 @@ func New() Config {
 					VerifyEmail: tracing.SpanConfig{
 						Opts: []trace.SpanStartOption{
 							trace.WithAttributes(
-								attribute.String("Environment", loadenv.GetEnv("ENVIRONMENT", "local")),
+								attribute.String(
+									"Environment",
+									loadenv.GetEnv("ENVIRONMENT", "local"),
+								),
 							),
 						},
 						Events: tracing.SpanEventsConfig{
@@ -222,7 +266,10 @@ func New() Config {
 								Name: "Calling verify-email worker handler",
 								Opts: []trace.EventOption{
 									trace.WithAttributes(
-										attribute.String("Environment", loadenv.GetEnv("ENVIRONMENT", "local")),
+										attribute.String(
+											"Environment",
+											loadenv.GetEnv("ENVIRONMENT", "local"),
+										),
 									),
 								},
 							},
@@ -230,7 +277,10 @@ func New() Config {
 								Name: "Received response from verify-email worker handler",
 								Opts: []trace.EventOption{
 									trace.WithAttributes(
-										attribute.String("Environment", loadenv.GetEnv("ENVIRONMENT", "local")),
+										attribute.String(
+											"Environment",
+											loadenv.GetEnv("ENVIRONMENT", "local"),
+										),
 									),
 								},
 							},
@@ -239,7 +289,10 @@ func New() Config {
 					ForgetPassword: tracing.SpanConfig{
 						Opts: []trace.SpanStartOption{
 							trace.WithAttributes(
-								attribute.String("Environment", loadenv.GetEnv("ENVIRONMENT", "local")),
+								attribute.String(
+									"Environment",
+									loadenv.GetEnv("ENVIRONMENT", "local"),
+								),
 							),
 						},
 						Events: tracing.SpanEventsConfig{
@@ -247,7 +300,10 @@ func New() Config {
 								Name: "Calling forget-password worker handler",
 								Opts: []trace.EventOption{
 									trace.WithAttributes(
-										attribute.String("Environment", loadenv.GetEnv("ENVIRONMENT", "local")),
+										attribute.String(
+											"Environment",
+											loadenv.GetEnv("ENVIRONMENT", "local"),
+										),
 									),
 								},
 							},
@@ -255,7 +311,10 @@ func New() Config {
 								Name: "Received response from forget-password worker handler",
 								Opts: []trace.EventOption{
 									trace.WithAttributes(
-										attribute.String("Environment", loadenv.GetEnv("ENVIRONMENT", "local")),
+										attribute.String(
+											"Environment",
+											loadenv.GetEnv("ENVIRONMENT", "local"),
+										),
 									),
 								},
 							},
@@ -264,7 +323,10 @@ func New() Config {
 					UpdateTicket: tracing.SpanConfig{
 						Opts: []trace.SpanStartOption{
 							trace.WithAttributes(
-								attribute.String("Environment", loadenv.GetEnv("ENVIRONMENT", "local")),
+								attribute.String(
+									"Environment",
+									loadenv.GetEnv("ENVIRONMENT", "local"),
+								),
 							),
 						},
 						Events: tracing.SpanEventsConfig{
@@ -272,7 +334,10 @@ func New() Config {
 								Name: "Calling update-ticket worker handler",
 								Opts: []trace.EventOption{
 									trace.WithAttributes(
-										attribute.String("Environment", loadenv.GetEnv("ENVIRONMENT", "local")),
+										attribute.String(
+											"Environment",
+											loadenv.GetEnv("ENVIRONMENT", "local"),
+										),
 									),
 								},
 							},
@@ -280,7 +345,10 @@ func New() Config {
 								Name: "Received response from update-ticket worker handler",
 								Opts: []trace.EventOption{
 									trace.WithAttributes(
-										attribute.String("Environment", loadenv.GetEnv("ENVIRONMENT", "local")),
+										attribute.String(
+											"Environment",
+											loadenv.GetEnv("ENVIRONMENT", "local"),
+										),
 									),
 								},
 							},
@@ -289,7 +357,10 @@ func New() Config {
 					DeleteTicket: tracing.SpanConfig{
 						Opts: []trace.SpanStartOption{
 							trace.WithAttributes(
-								attribute.String("Environment", loadenv.GetEnv("ENVIRONMENT", "local")),
+								attribute.String(
+									"Environment",
+									loadenv.GetEnv("ENVIRONMENT", "local"),
+								),
 							),
 						},
 						Events: tracing.SpanEventsConfig{
@@ -297,7 +368,10 @@ func New() Config {
 								Name: "Calling delete-ticket worker handler",
 								Opts: []trace.EventOption{
 									trace.WithAttributes(
-										attribute.String("Environment", loadenv.GetEnv("ENVIRONMENT", "local")),
+										attribute.String(
+											"Environment",
+											loadenv.GetEnv("ENVIRONMENT", "local"),
+										),
 									),
 								},
 							},
@@ -305,7 +379,10 @@ func New() Config {
 								Name: "Received response from delete-ticket worker handler",
 								Opts: []trace.EventOption{
 									trace.WithAttributes(
-										attribute.String("Environment", loadenv.GetEnv("ENVIRONMENT", "local")),
+										attribute.String(
+											"Environment",
+											loadenv.GetEnv("ENVIRONMENT", "local"),
+										),
 									),
 								},
 							},
@@ -316,7 +393,10 @@ func New() Config {
 					Email: tracing.SpanConfig{
 						Opts: []trace.SpanStartOption{
 							trace.WithAttributes(
-								attribute.String("Environment", loadenv.GetEnv("ENVIRONMENT", "local")),
+								attribute.String(
+									"Environment",
+									loadenv.GetEnv("ENVIRONMENT", "local"),
+								),
 							),
 						},
 						Events: tracing.SpanEventsConfig{
@@ -324,7 +404,10 @@ func New() Config {
 								Name: "Sending email",
 								Opts: []trace.EventOption{
 									trace.WithAttributes(
-										attribute.String("Environment", loadenv.GetEnv("ENVIRONMENT", "local")),
+										attribute.String(
+											"Environment",
+											loadenv.GetEnv("ENVIRONMENT", "local"),
+										),
 									),
 								},
 							},
@@ -332,7 +415,10 @@ func New() Config {
 								Name: "Sent email",
 								Opts: []trace.EventOption{
 									trace.WithAttributes(
-										attribute.String("Environment", loadenv.GetEnv("ENVIRONMENT", "local")),
+										attribute.String(
+											"Environment",
+											loadenv.GetEnv("ENVIRONMENT", "local"),
+										),
 									),
 								},
 							},
@@ -360,7 +446,10 @@ func New() Config {
 					Name: loadenv.GetEnv("NATS_VERIFY_EMAIL_WORKER_NAME", "verify-email-worker"),
 				},
 				ForgetPassword: NATSWorker{
-					Name: loadenv.GetEnv("NATS_FORGET_PASSWORD_WORKER_NAME", "forget-password-worker"),
+					Name: loadenv.GetEnv(
+						"NATS_FORGET_PASSWORD_WORKER_NAME",
+						"forget-password-worker",
+					),
 				},
 				UpdateTicket: NATSWorker{
 					Name: loadenv.GetEnv("NATS_UPDATE_TICKET_WORKER_NAME", "update-ticket-worker"),
@@ -377,10 +466,16 @@ func New() Config {
 				Login:    loadenv.GetEnv("EMAIL_SMTP_LOGIN", "smtp"),
 				Password: loadenv.GetEnv("EMAIL_SMTP_PASSWORD", "smtp"),
 			},
-			VerifyEmailURL:    loadenv.GetEnv("EMAIL_VERIFY_URL", "http://localhost:8090/sso/verify-email"),
-			ForgetPasswordURL: loadenv.GetEnv("FORGET_PASSWORD_URL", "http://localhost:8090/sso/login"),
-			UpdateTicketURL:   loadenv.GetEnv("UPDATE_TICKET_URL", "http://localhost:8090/tickets"),
-			DeleteTicketURL:   loadenv.GetEnv("UPDATE_TICKET_URL", "http://localhost:8090/users"),
+			VerifyEmailURL: loadenv.GetEnv(
+				"EMAIL_VERIFY_URL",
+				"http://localhost:8090/sso/verify-email",
+			),
+			ForgetPasswordURL: loadenv.GetEnv(
+				"FORGET_PASSWORD_URL",
+				"http://localhost:8090/sso/login",
+			),
+			UpdateTicketURL: loadenv.GetEnv("UPDATE_TICKET_URL", "http://localhost:8090/tickets"),
+			DeleteTicketURL: loadenv.GetEnv("UPDATE_TICKET_URL", "http://localhost:8090/users"),
 		},
 	}
 }

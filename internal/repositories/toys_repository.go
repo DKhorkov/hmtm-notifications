@@ -3,9 +3,8 @@ package repositories
 import (
 	"context"
 
-	"google.golang.org/protobuf/types/known/emptypb"
-
 	"github.com/DKhorkov/hmtm-toys/api/protobuf/generated/go/toys"
+	"google.golang.org/protobuf/types/known/emptypb"
 
 	"github.com/DKhorkov/hmtm-notifications/internal/entities"
 	"github.com/DKhorkov/hmtm-notifications/internal/interfaces"
@@ -24,7 +23,6 @@ func (repo *ToysRepository) GetAllToys(ctx context.Context) ([]entities.Toy, err
 		ctx,
 		&emptypb.Empty{},
 	)
-
 	if err != nil {
 		return nil, err
 	}
@@ -37,14 +35,16 @@ func (repo *ToysRepository) GetAllToys(ctx context.Context) ([]entities.Toy, err
 	return allToys, nil
 }
 
-func (repo *ToysRepository) GetMasterToys(ctx context.Context, masterID uint64) ([]entities.Toy, error) {
+func (repo *ToysRepository) GetMasterToys(
+	ctx context.Context,
+	masterID uint64,
+) ([]entities.Toy, error) {
 	response, err := repo.client.GetMasterToys(
 		ctx,
 		&toys.GetMasterToysIn{
 			MasterID: masterID,
 		},
 	)
-
 	if err != nil {
 		return nil, err
 	}
@@ -57,14 +57,16 @@ func (repo *ToysRepository) GetMasterToys(ctx context.Context, masterID uint64) 
 	return masterToys, nil
 }
 
-func (repo *ToysRepository) GetUserToys(ctx context.Context, userID uint64) ([]entities.Toy, error) {
+func (repo *ToysRepository) GetUserToys(
+	ctx context.Context,
+	userID uint64,
+) ([]entities.Toy, error) {
 	response, err := repo.client.GetUserToys(
 		ctx,
 		&toys.GetUserToysIn{
 			UserID: userID,
 		},
 	)
-
 	if err != nil {
 		return nil, err
 	}
@@ -84,7 +86,6 @@ func (repo *ToysRepository) GetToyByID(ctx context.Context, id uint64) (*entitie
 			ID: id,
 		},
 	)
-
 	if err != nil {
 		return nil, err
 	}
@@ -97,7 +98,6 @@ func (repo *ToysRepository) GetAllMasters(ctx context.Context) ([]entities.Maste
 		ctx,
 		&emptypb.Empty{},
 	)
-
 	if err != nil {
 		return nil, err
 	}
@@ -110,14 +110,16 @@ func (repo *ToysRepository) GetAllMasters(ctx context.Context) ([]entities.Maste
 	return masters, nil
 }
 
-func (repo *ToysRepository) GetMasterByID(ctx context.Context, id uint64) (*entities.Master, error) {
+func (repo *ToysRepository) GetMasterByID(
+	ctx context.Context,
+	id uint64,
+) (*entities.Master, error) {
 	response, err := repo.client.GetMaster(
 		ctx,
 		&toys.GetMasterIn{
 			ID: id,
 		},
 	)
-
 	if err != nil {
 		return nil, err
 	}
@@ -130,7 +132,6 @@ func (repo *ToysRepository) GetAllCategories(ctx context.Context) ([]entities.Ca
 		ctx,
 		&emptypb.Empty{},
 	)
-
 	if err != nil {
 		return nil, err
 	}
@@ -143,14 +144,16 @@ func (repo *ToysRepository) GetAllCategories(ctx context.Context) ([]entities.Ca
 	return categories, nil
 }
 
-func (repo *ToysRepository) GetCategoryByID(ctx context.Context, id uint32) (*entities.Category, error) {
+func (repo *ToysRepository) GetCategoryByID(
+	ctx context.Context,
+	id uint32,
+) (*entities.Category, error) {
 	response, err := repo.client.GetCategory(
 		ctx,
 		&toys.GetCategoryIn{
 			ID: id,
 		},
 	)
-
 	if err != nil {
 		return nil, err
 	}
@@ -163,7 +166,6 @@ func (repo *ToysRepository) GetAllTags(ctx context.Context) ([]entities.Tag, err
 		ctx,
 		&emptypb.Empty{},
 	)
-
 	if err != nil {
 		return nil, err
 	}
@@ -183,7 +185,6 @@ func (repo *ToysRepository) GetTagByID(ctx context.Context, id uint32) (*entitie
 			ID: id,
 		},
 	)
-
 	if err != nil {
 		return nil, err
 	}
@@ -198,7 +199,9 @@ func (repo *ToysRepository) processTagResponse(tagResponse *toys.GetTagOut) *ent
 	}
 }
 
-func (repo *ToysRepository) processMasterResponse(masterResponse *toys.GetMasterOut) *entities.Master {
+func (repo *ToysRepository) processMasterResponse(
+	masterResponse *toys.GetMasterOut,
+) *entities.Master {
 	return &entities.Master{
 		ID:        masterResponse.GetID(),
 		UserID:    masterResponse.GetUserID(),
@@ -208,7 +211,9 @@ func (repo *ToysRepository) processMasterResponse(masterResponse *toys.GetMaster
 	}
 }
 
-func (repo *ToysRepository) processCategoryResponse(categoryResponse *toys.GetCategoryOut) *entities.Category {
+func (repo *ToysRepository) processCategoryResponse(
+	categoryResponse *toys.GetCategoryOut,
+) *entities.Category {
 	return &entities.Category{
 		ID:   categoryResponse.GetID(),
 		Name: categoryResponse.GetName(),
@@ -247,14 +252,16 @@ func (repo *ToysRepository) processToyResponse(toyResponse *toys.GetToyOut) *ent
 	}
 }
 
-func (repo *ToysRepository) GetMasterByUser(ctx context.Context, userID uint64) (*entities.Master, error) {
+func (repo *ToysRepository) GetMasterByUser(
+	ctx context.Context,
+	userID uint64,
+) (*entities.Master, error) {
 	response, err := repo.client.GetMasterByUser(
 		ctx,
 		&toys.GetMasterByUserIn{
 			UserID: userID,
 		},
 	)
-
 	if err != nil {
 		return nil, err
 	}

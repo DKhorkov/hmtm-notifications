@@ -4,11 +4,10 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/DKhorkov/libs/requestid"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/metadata"
-
-	"github.com/DKhorkov/libs/requestid"
 
 	"github.com/DKhorkov/hmtm-notifications/api/protobuf/generated/go/notifications"
 )
@@ -24,7 +23,6 @@ func main() {
 			insecure.NewCredentials(),
 		),
 	)
-
 	if err != nil {
 		panic(err)
 	}
@@ -35,8 +33,11 @@ func main() {
 
 	ctx := metadata.AppendToOutgoingContext(context.Background(), requestid.Key, requestid.New())
 
-	emails, err := client.GetUserEmailCommunications(ctx, &notifications.GetUserEmailCommunicationsIn{
-		UserID: 1,
-	})
+	emails, err := client.GetUserEmailCommunications(
+		ctx,
+		&notifications.GetUserEmailCommunicationsIn{
+			UserID: 1,
+		},
+	)
 	fmt.Printf("Emails: %+v\nErr: %v\n", emails, err)
 }
