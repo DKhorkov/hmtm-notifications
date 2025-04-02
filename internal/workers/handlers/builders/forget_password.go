@@ -57,7 +57,6 @@ func (b *ForgetPasswordBuilder) MessageHandler() handlers.MessageHandler {
 		if _, err := b.useCases.SendForgetPasswordEmailCommunication(
 			ctx,
 			forgetPasswordDTO.UserID,
-			forgetPasswordDTO.NewPassword,
 		); err != nil {
 			logging.LogError(
 				b.logger,
@@ -75,6 +74,7 @@ func (b *ForgetPasswordBuilder) natsMessageToDTO(message *nats.Msg) *dto.ForgetP
 	var forgetPasswordDTO dto.ForgetPasswordDTO
 	if err := json.Unmarshal(message.Data, &forgetPasswordDTO); err != nil {
 		logging.LogError(b.logger, "Failed to unmarshal forget-password message", err)
+
 		return nil
 	}
 

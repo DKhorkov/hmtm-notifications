@@ -472,7 +472,7 @@ func New() Config {
 			),
 			ForgetPasswordURL: loadenv.GetEnv(
 				"FORGET_PASSWORD_URL",
-				"http://localhost:8090/sso/login",
+				"http://localhost:8090/sso/forget-password",
 			),
 			UpdateTicketURL: loadenv.GetEnv("UPDATE_TICKET_URL", "http://localhost:8090/tickets"),
 			DeleteTicketURL: loadenv.GetEnv("UPDATE_TICKET_URL", "http://localhost:8090/users"),

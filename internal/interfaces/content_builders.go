@@ -19,7 +19,7 @@ type VerifyEmailContentBuilder interface {
 
 type ForgetPasswordContentBuilder interface {
 	Subject() string
-	Body(user entities.User, newPassword string) string
+	Body(user entities.User) string
 }
 
 type UpdateTicketContentBuilder interface {

@@ -74,6 +74,7 @@ func (b *VerifyEmailBuilder) natsMessageToDTO(message *nats.Msg) *dto.VerifyEmai
 	var verifyEmailDTO dto.VerifyEmailDTO
 	if err := json.Unmarshal(message.Data, &verifyEmailDTO); err != nil {
 		logging.LogError(b.logger, "Failed to unmarshal verify-email message", err)
+
 		return nil
 	}
 

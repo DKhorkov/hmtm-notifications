@@ -74,6 +74,7 @@ func (b *UpdateTicketBuilder) natsMessageToDTO(message *nats.Msg) *dto.UpdateTic
 	var updateTicketDTO dto.UpdateTicketDTO
 	if err := json.Unmarshal(message.Data, &updateTicketDTO); err != nil {
 		logging.LogError(b.logger, "Failed to unmarshal update-ticket message", err)
+
 		return nil
 	}
 

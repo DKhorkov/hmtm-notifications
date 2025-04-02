@@ -48,6 +48,7 @@ func (b *DeleteTicketContentBuilder) Body(
 <p>С уважением,<br>
 команда Handmade Toys Marketplace.</p>
 `
+
 	return fmt.Sprintf(
 		template,
 		respondOwner.DisplayName,

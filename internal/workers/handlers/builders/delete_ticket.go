@@ -70,6 +70,7 @@ func (b *DeleteTicketBuilder) natsMessageToDTO(message *nats.Msg) *dto.DeleteTic
 	var deleteTicketDTO dto.DeleteTicketDTO
 	if err := json.Unmarshal(message.Data, &deleteTicketDTO); err != nil {
 		logging.LogError(b.logger, "Failed to unmarshal delete-ticket message", err)
+
 		return nil
 	}
 
