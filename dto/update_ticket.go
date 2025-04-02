@@ -1,5 +1,5 @@
 package dto
 
 type UpdateTicketDTO struct {
-	TicketID uint64 `json:"ticket_id"`
+	TicketID uint64 `json:"ticketId"`
 }

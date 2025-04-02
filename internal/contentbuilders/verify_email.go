@@ -35,6 +35,7 @@ func (b *VerifyEmailContentBuilder) Body(user entities.User) string {
 <p>С уважением,<br>
 команда Handmade Toys Marketplace.</p>
 `
+
 	return fmt.Sprintf(
 		template,
 		user.DisplayName,

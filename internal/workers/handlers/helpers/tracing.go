@@ -15,5 +15,6 @@ func AddTraceIDToContext(ctx context.Context, span trace.Span) context.Context {
 		tracing.Key,
 		traceID,
 	) // setting for cross-service usage
+
 	return ctx
 }

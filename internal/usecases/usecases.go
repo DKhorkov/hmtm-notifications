@@ -74,7 +74,6 @@ func (useCases *UseCases) SendVerifyEmailCommunication(
 func (useCases *UseCases) SendForgetPasswordEmailCommunication(
 	ctx context.Context,
 	userID uint64,
-	newPassword string,
 ) (uint64, error) {
 	user, err := useCases.ssoService.GetUserByID(ctx, userID)
 	if err != nil {
@@ -84,7 +83,7 @@ func (useCases *UseCases) SendForgetPasswordEmailCommunication(
 	if err = useCases.senders.Email.Send(
 		ctx,
 		useCases.contentBuilders.ForgetPassword.Subject(),
-		useCases.contentBuilders.ForgetPassword.Body(*user, newPassword),
+		useCases.contentBuilders.ForgetPassword.Body(*user),
 		[]string{user.Email},
 	); err != nil {
 		return 0, err
@@ -93,7 +92,7 @@ func (useCases *UseCases) SendForgetPasswordEmailCommunication(
 	emailCommunication := entities.Email{
 		UserID:  user.ID,
 		Email:   user.Email,
-		Content: useCases.contentBuilders.ForgetPassword.Body(*user, newPassword),
+		Content: useCases.contentBuilders.ForgetPassword.Body(*user),
 		SentAt:  time.Now().UTC(),
 	}
 
@@ -115,6 +114,7 @@ func (useCases *UseCases) SendUpdateTicketEmailCommunication(
 	}
 
 	var emailIDs []uint64
+
 	for _, respond := range responds {
 		master, err := useCases.toysService.GetMasterByID(ctx, respond.MasterID)
 		if err != nil {
@@ -163,6 +163,7 @@ func (useCases *UseCases) SendDeleteTicketEmailCommunication(
 	}
 
 	var emailIDs []uint64
+
 	for _, masterID := range ticketData.RespondedMastersIDs {
 		master, err := useCases.toysService.GetMasterByID(ctx, masterID)
 		if err != nil {

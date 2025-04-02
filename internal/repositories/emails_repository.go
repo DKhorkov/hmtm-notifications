@@ -99,9 +99,11 @@ func (repo *EmailsRepository) GetUserCommunications(
 	}()
 
 	var emails []entities.Email
+
 	for rows.Next() {
 		email := entities.Email{}
 		columns := db.GetEntityColumns(&email) // Only pointer to use rows.Scan() successfully
+
 		err = rows.Scan(columns...)
 		if err != nil {
 			return nil, err
