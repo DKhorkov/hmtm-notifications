@@ -9,14 +9,14 @@ import (
 	"github.com/DKhorkov/hmtm-notifications/internal/entities"
 )
 
+type VerifyEmailContentBuilder struct {
+	verifyEmailURLBase string
+}
+
 func NewVerifyEmailContentBuilder(verifyEmailURLBase string) *VerifyEmailContentBuilder {
 	return &VerifyEmailContentBuilder{
 		verifyEmailURLBase: verifyEmailURLBase,
 	}
-}
-
-type VerifyEmailContentBuilder struct {
-	verifyEmailURLBase string
 }
 
 func (b *VerifyEmailContentBuilder) Subject() string {

@@ -8,14 +8,14 @@ import (
 	"github.com/DKhorkov/hmtm-notifications/internal/entities"
 )
 
+type DeleteTicketContentBuilder struct {
+	deleteTicketURLBase string
+}
+
 func NewDeleteTicketContentBuilder(deleteTicketURLBase string) *DeleteTicketContentBuilder {
 	return &DeleteTicketContentBuilder{
 		deleteTicketURLBase: deleteTicketURLBase,
 	}
-}
-
-type DeleteTicketContentBuilder struct {
-	deleteTicketURLBase string
 }
 
 func (b *DeleteTicketContentBuilder) Subject(ticketData dto.DeleteTicketDTO) string {

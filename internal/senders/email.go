@@ -9,6 +9,12 @@ import (
 	"github.com/DKhorkov/hmtm-notifications/internal/config"
 )
 
+type EmailSender struct {
+	smtpConfig    config.SMTPConfig
+	traceProvider tracing.Provider
+	spanConfig    tracing.SpanConfig
+}
+
 func NewEmailSender(
 	smtpConfig config.SMTPConfig,
 	traceProvider tracing.Provider,
@@ -19,12 +25,6 @@ func NewEmailSender(
 		traceProvider: traceProvider,
 		spanConfig:    spanConfig,
 	}
-}
-
-type EmailSender struct {
-	smtpConfig    config.SMTPConfig
-	traceProvider tracing.Provider
-	spanConfig    tracing.SpanConfig
 }
 
 func (s *EmailSender) Send(ctx context.Context, subject, body string, recipients []string) error {

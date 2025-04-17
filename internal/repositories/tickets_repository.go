@@ -10,12 +10,12 @@ import (
 	"github.com/DKhorkov/hmtm-notifications/internal/interfaces"
 )
 
-func NewTicketsRepository(client interfaces.TicketsClient) *TicketsRepository {
-	return &TicketsRepository{client: client}
-}
-
 type TicketsRepository struct {
 	client interfaces.TicketsClient
+}
+
+func NewTicketsRepository(client interfaces.TicketsClient) *TicketsRepository {
+	return &TicketsRepository{client: client}
 }
 
 func (repo *TicketsRepository) GetTicketByID(

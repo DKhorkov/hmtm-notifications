@@ -15,6 +15,13 @@ import (
 	"github.com/DKhorkov/hmtm-notifications/internal/workers/handlers/helpers"
 )
 
+type UpdateTicketBuilder struct {
+	useCases      interfaces.UseCases
+	traceProvider tracing.Provider
+	spanConfig    tracing.SpanConfig
+	logger        logging.Logger
+}
+
 func NewUpdateTicketBuilder(
 	useCases interfaces.UseCases,
 	traceProvider tracing.Provider,
@@ -27,13 +34,6 @@ func NewUpdateTicketBuilder(
 		spanConfig:    spanConfig,
 		logger:        logger,
 	}
-}
-
-type UpdateTicketBuilder struct {
-	useCases      interfaces.UseCases
-	traceProvider tracing.Provider
-	spanConfig    tracing.SpanConfig
-	logger        logging.Logger
 }
 
 func (b *UpdateTicketBuilder) MessageHandler() handlers.MessageHandler {

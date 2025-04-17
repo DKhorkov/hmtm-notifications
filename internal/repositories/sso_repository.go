@@ -10,12 +10,12 @@ import (
 	"github.com/DKhorkov/hmtm-notifications/internal/interfaces"
 )
 
-func NewSsoRepository(client interfaces.SsoGrpcClient) *SsoRepository {
-	return &SsoRepository{client: client}
+type SsoRepository struct {
+	client interfaces.SsoClient
 }
 
-type SsoRepository struct {
-	client interfaces.SsoGrpcClient
+func NewSsoRepository(client interfaces.SsoClient) *SsoRepository {
+	return &SsoRepository{client: client}
 }
 
 func (repo *SsoRepository) GetUserByID(ctx context.Context, id uint64) (*entities.User, error) {

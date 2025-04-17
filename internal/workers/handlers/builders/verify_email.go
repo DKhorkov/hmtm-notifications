@@ -15,6 +15,13 @@ import (
 	"github.com/DKhorkov/hmtm-notifications/internal/workers/handlers/helpers"
 )
 
+type VerifyEmailBuilder struct {
+	useCases      interfaces.UseCases
+	traceProvider tracing.Provider
+	spanConfig    tracing.SpanConfig
+	logger        logging.Logger
+}
+
 func NewVerifyEmailBuilder(
 	useCases interfaces.UseCases,
 	traceProvider tracing.Provider,
@@ -27,13 +34,6 @@ func NewVerifyEmailBuilder(
 		spanConfig:    spanConfig,
 		logger:        logger,
 	}
-}
-
-type VerifyEmailBuilder struct {
-	useCases      interfaces.UseCases
-	traceProvider tracing.Provider
-	spanConfig    tracing.SpanConfig
-	logger        logging.Logger
 }
 
 func (b *VerifyEmailBuilder) MessageHandler() handlers.MessageHandler {

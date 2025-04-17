@@ -24,6 +24,14 @@ const (
 	returningIDSuffix      = "RETURNING id"
 )
 
+type EmailsRepository struct {
+	dbConnector   db.Connector
+	logger        logging.Logger
+	traceProvider tracing.Provider
+	spanConfig    tracing.SpanConfig
+	mutex         *sync.RWMutex
+}
+
 func NewEmailsRepository(
 	dbConnector db.Connector,
 	logger logging.Logger,
@@ -37,14 +45,6 @@ func NewEmailsRepository(
 		spanConfig:    spanConfig,
 		mutex:         new(sync.RWMutex),
 	}
-}
-
-type EmailsRepository struct {
-	dbConnector   db.Connector
-	logger        logging.Logger
-	traceProvider tracing.Provider
-	spanConfig    tracing.SpanConfig
-	mutex         *sync.RWMutex
 }
 
 func (repo *EmailsRepository) GetUserCommunications(

@@ -10,12 +10,12 @@ import (
 	"github.com/DKhorkov/hmtm-notifications/internal/interfaces"
 )
 
-func NewToysRepository(client interfaces.ToysClient) *ToysRepository {
-	return &ToysRepository{client: client}
-}
-
 type ToysRepository struct {
 	client interfaces.ToysClient
+}
+
+func NewToysRepository(client interfaces.ToysClient) *ToysRepository {
+	return &ToysRepository{client: client}
 }
 
 func (repo *ToysRepository) GetAllToys(ctx context.Context) ([]entities.Toy, error) {
@@ -192,32 +192,21 @@ func (repo *ToysRepository) GetTagByID(ctx context.Context, id uint32) (*entitie
 	return repo.processTagResponse(response), nil
 }
 
-func (repo *ToysRepository) processTagResponse(tagResponse *toys.GetTagOut) *entities.Tag {
-	return &entities.Tag{
-		ID:   tagResponse.GetID(),
-		Name: tagResponse.GetName(),
+func (repo *ToysRepository) GetMasterByUser(
+	ctx context.Context,
+	userID uint64,
+) (*entities.Master, error) {
+	response, err := repo.client.GetMasterByUser(
+		ctx,
+		&toys.GetMasterByUserIn{
+			UserID: userID,
+		},
+	)
+	if err != nil {
+		return nil, err
 	}
-}
 
-func (repo *ToysRepository) processMasterResponse(
-	masterResponse *toys.GetMasterOut,
-) *entities.Master {
-	return &entities.Master{
-		ID:        masterResponse.GetID(),
-		UserID:    masterResponse.GetUserID(),
-		Info:      masterResponse.Info,
-		CreatedAt: masterResponse.GetCreatedAt().AsTime(),
-		UpdatedAt: masterResponse.GetUpdatedAt().AsTime(),
-	}
-}
-
-func (repo *ToysRepository) processCategoryResponse(
-	categoryResponse *toys.GetCategoryOut,
-) *entities.Category {
-	return &entities.Category{
-		ID:   categoryResponse.GetID(),
-		Name: categoryResponse.GetName(),
-	}
+	return repo.processMasterResponse(response), nil
 }
 
 func (repo *ToysRepository) processToyResponse(toyResponse *toys.GetToyOut) *entities.Toy {
@@ -252,19 +241,30 @@ func (repo *ToysRepository) processToyResponse(toyResponse *toys.GetToyOut) *ent
 	}
 }
 
-func (repo *ToysRepository) GetMasterByUser(
-	ctx context.Context,
-	userID uint64,
-) (*entities.Master, error) {
-	response, err := repo.client.GetMasterByUser(
-		ctx,
-		&toys.GetMasterByUserIn{
-			UserID: userID,
-		},
-	)
-	if err != nil {
-		return nil, err
+func (repo *ToysRepository) processCategoryResponse(
+	categoryResponse *toys.GetCategoryOut,
+) *entities.Category {
+	return &entities.Category{
+		ID:   categoryResponse.GetID(),
+		Name: categoryResponse.GetName(),
 	}
+}
 
-	return repo.processMasterResponse(response), nil
+func (repo *ToysRepository) processMasterResponse(
+	masterResponse *toys.GetMasterOut,
+) *entities.Master {
+	return &entities.Master{
+		ID:        masterResponse.GetID(),
+		UserID:    masterResponse.GetUserID(),
+		Info:      masterResponse.Info,
+		CreatedAt: masterResponse.GetCreatedAt().AsTime(),
+		UpdatedAt: masterResponse.GetUpdatedAt().AsTime(),
+	}
+}
+
+func (repo *ToysRepository) processTagResponse(tagResponse *toys.GetTagOut) *entities.Tag {
+	return &entities.Tag{
+		ID:   tagResponse.GetID(),
+		Name: tagResponse.GetName(),
+	}
 }
