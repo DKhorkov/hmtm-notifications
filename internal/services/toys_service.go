@@ -10,16 +10,16 @@ import (
 	"github.com/DKhorkov/hmtm-notifications/internal/interfaces"
 )
 
+type ToysService struct {
+	toysRepository interfaces.ToysRepository
+	logger         logging.Logger
+}
+
 func NewToysService(toysRepository interfaces.ToysRepository, logger logging.Logger) *ToysService {
 	return &ToysService{
 		toysRepository: toysRepository,
 		logger:         logger,
 	}
-}
-
-type ToysService struct {
-	toysRepository interfaces.ToysRepository
-	logger         logging.Logger
 }
 
 func (service *ToysService) GetAllToys(ctx context.Context) ([]entities.Toy, error) {

@@ -9,14 +9,14 @@ import (
 	"github.com/DKhorkov/hmtm-notifications/internal/entities"
 )
 
+type ForgetPasswordContentBuilder struct {
+	forgetPasswordURLBase string
+}
+
 func NewForgetPasswordContentBuilder(forgetPasswordURLBase string) *ForgetPasswordContentBuilder {
 	return &ForgetPasswordContentBuilder{
 		forgetPasswordURLBase: forgetPasswordURLBase,
 	}
-}
-
-type ForgetPasswordContentBuilder struct {
-	forgetPasswordURLBase string
 }
 
 func (b *ForgetPasswordContentBuilder) Subject() string {

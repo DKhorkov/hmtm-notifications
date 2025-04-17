@@ -15,6 +15,13 @@ import (
 	"github.com/DKhorkov/hmtm-notifications/internal/workers/handlers/helpers"
 )
 
+type ForgetPasswordBuilder struct {
+	useCases      interfaces.UseCases
+	traceProvider tracing.Provider
+	spanConfig    tracing.SpanConfig
+	logger        logging.Logger
+}
+
 func NewForgetPasswordBuilder(
 	useCases interfaces.UseCases,
 	traceProvider tracing.Provider,
@@ -27,13 +34,6 @@ func NewForgetPasswordBuilder(
 		spanConfig:    spanConfig,
 		logger:        logger,
 	}
-}
-
-type ForgetPasswordBuilder struct {
-	useCases      interfaces.UseCases
-	traceProvider tracing.Provider
-	spanConfig    tracing.SpanConfig
-	logger        logging.Logger
 }
 
 func (b *ForgetPasswordBuilder) MessageHandler() handlers.MessageHandler {

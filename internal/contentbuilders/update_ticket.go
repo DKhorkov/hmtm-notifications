@@ -7,14 +7,14 @@ import (
 	"github.com/DKhorkov/hmtm-notifications/internal/entities"
 )
 
+type UpdateTicketContentBuilder struct {
+	updateTicketURLBase string
+}
+
 func NewUpdateTicketContentBuilder(updateTicketURLBase string) *UpdateTicketContentBuilder {
 	return &UpdateTicketContentBuilder{
 		updateTicketURLBase: updateTicketURLBase,
 	}
-}
-
-type UpdateTicketContentBuilder struct {
-	updateTicketURLBase string
 }
 
 func (b *UpdateTicketContentBuilder) Subject(ticket entities.RawTicket) string {
