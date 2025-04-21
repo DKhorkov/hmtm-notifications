@@ -17,13 +17,13 @@ import (
 	mockusecases "github.com/DKhorkov/hmtm-notifications/mocks/usecases"
 )
 
-func TestUpdateTicketBuilder_MessageHandler(t *testing.T) {
+func TestTicketUpdatedBuilder_MessageHandler(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	useCases := mockusecases.NewMockUseCases(ctrl)
 	traceProvider := mocktracing.NewMockProvider(ctrl)
 	logger := mocklogging.NewMockLogger(ctrl)
 	spanConfig := tracing.SpanConfig{}
-	builder := NewUpdateTicketBuilder(
+	builder := NewTicketUpdatedBuilder(
 		useCases,
 		traceProvider,
 		spanConfig,
@@ -49,7 +49,7 @@ func TestUpdateTicketBuilder_MessageHandler(t *testing.T) {
 
 				useCases.
 					EXPECT().
-					SendUpdateTicketEmailCommunication(gomock.Any(), uint64(123)).
+					SendTicketUpdatedEmailCommunication(gomock.Any(), uint64(123)).
 					Return([]uint64{1}, nil).
 					Times(1)
 			},
@@ -86,7 +86,7 @@ func TestUpdateTicketBuilder_MessageHandler(t *testing.T) {
 
 				useCases.
 					EXPECT().
-					SendUpdateTicketEmailCommunication(gomock.Any(), uint64(456)).
+					SendTicketUpdatedEmailCommunication(gomock.Any(), uint64(456)).
 					Return(nil, errors.New("test")).
 					Times(1)
 
@@ -107,13 +107,13 @@ func TestUpdateTicketBuilder_MessageHandler(t *testing.T) {
 	}
 }
 
-func TestUpdateTicketBuilder_natsMessageToDTO(t *testing.T) {
+func TestTicketUpdatedBuilder_natsMessageToDTO(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	useCases := mockusecases.NewMockUseCases(ctrl)
 	traceProvider := mocktracing.NewMockProvider(ctrl)
 	logger := mocklogging.NewMockLogger(ctrl)
 	spanConfig := tracing.SpanConfig{}
-	builder := NewUpdateTicketBuilder(
+	builder := NewTicketUpdatedBuilder(
 		useCases,
 		traceProvider,
 		spanConfig,
@@ -123,7 +123,7 @@ func TestUpdateTicketBuilder_natsMessageToDTO(t *testing.T) {
 	testCases := []struct {
 		name        string
 		message     *nats.Msg
-		expectedDTO *dto.UpdateTicketDTO
+		expectedDTO *dto.TicketUpdatedDTO
 		setupMocks  func(logger *mocklogging.MockLogger)
 	}{
 		{
@@ -131,7 +131,7 @@ func TestUpdateTicketBuilder_natsMessageToDTO(t *testing.T) {
 			message: &nats.Msg{
 				Data: []byte(`{"ticketId":123}`),
 			},
-			expectedDTO: &dto.UpdateTicketDTO{
+			expectedDTO: &dto.TicketUpdatedDTO{
 				TicketID: 123,
 			},
 			setupMocks: func(logger *mocklogging.MockLogger) {},

@@ -18,13 +18,13 @@ import (
 	mockusecases "github.com/DKhorkov/hmtm-notifications/mocks/usecases"
 )
 
-func TestDeleteTicketBuilder_MessageHandler(t *testing.T) {
+func TestTicketDeletedBuilder_MessageHandler(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	useCases := mockusecases.NewMockUseCases(ctrl)
 	traceProvider := mocktracing.NewMockProvider(ctrl)
 	logger := mocklogging.NewMockLogger(ctrl)
 	spanConfig := tracing.SpanConfig{}
-	builder := NewDeleteTicketBuilder(
+	builder := NewTicketDeletedBuilder(
 		useCases,
 		traceProvider,
 		spanConfig,
@@ -48,7 +48,7 @@ func TestDeleteTicketBuilder_MessageHandler(t *testing.T) {
 					Return(context.Background(), mocktracing.NewMockSpan()).
 					Times(1)
 
-				deleteTicketDTO := dto.DeleteTicketDTO{
+				ticketDeletedDTO := dto.TicketDeletedDTO{
 					Name:        "Teddy Bear",
 					Description: "Soft toy",
 					Quantity:    5,
@@ -57,7 +57,7 @@ func TestDeleteTicketBuilder_MessageHandler(t *testing.T) {
 
 				useCases.
 					EXPECT().
-					SendDeleteTicketEmailCommunication(gomock.Any(), deleteTicketDTO).
+					SendTicketDeletedEmailCommunication(gomock.Any(), ticketDeletedDTO).
 					Return(nil, nil).
 					Times(1)
 			},
@@ -92,7 +92,7 @@ func TestDeleteTicketBuilder_MessageHandler(t *testing.T) {
 					Return(context.Background(), mocktracing.NewMockSpan()).
 					Times(1)
 
-				deleteTicketDTO := dto.DeleteTicketDTO{
+				ticketDeletedDTO := dto.TicketDeletedDTO{
 					Name:        "Wooden Car",
 					Description: "Toy car",
 					Quantity:    1,
@@ -101,7 +101,7 @@ func TestDeleteTicketBuilder_MessageHandler(t *testing.T) {
 
 				useCases.
 					EXPECT().
-					SendDeleteTicketEmailCommunication(gomock.Any(), deleteTicketDTO).
+					SendTicketDeletedEmailCommunication(gomock.Any(), ticketDeletedDTO).
 					Return(nil, errors.New("test")).
 					Times(1)
 
@@ -122,13 +122,13 @@ func TestDeleteTicketBuilder_MessageHandler(t *testing.T) {
 	}
 }
 
-func TestDeleteTicketBuilder_natsMessageToDTO(t *testing.T) {
+func TestTicketDeletedBuilder_natsMessageToDTO(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	useCases := mockusecases.NewMockUseCases(ctrl)
 	traceProvider := mocktracing.NewMockProvider(ctrl)
 	logger := mocklogging.NewMockLogger(ctrl)
 	spanConfig := tracing.SpanConfig{}
-	builder := NewDeleteTicketBuilder(
+	builder := NewTicketDeletedBuilder(
 		useCases,
 		traceProvider,
 		spanConfig,
@@ -138,7 +138,7 @@ func TestDeleteTicketBuilder_natsMessageToDTO(t *testing.T) {
 	testCases := []struct {
 		name        string
 		message     *nats.Msg
-		expectedDTO *dto.DeleteTicketDTO
+		expectedDTO *dto.TicketDeletedDTO
 		setupMocks  func(logger *mocklogging.MockLogger)
 	}{
 		{
@@ -146,7 +146,7 @@ func TestDeleteTicketBuilder_natsMessageToDTO(t *testing.T) {
 			message: &nats.Msg{
 				Data: []byte(`{"name":"Teddy Bear","description":"Soft toy","quantity":5,"price":150.75}`),
 			},
-			expectedDTO: &dto.DeleteTicketDTO{
+			expectedDTO: &dto.TicketDeletedDTO{
 				Name:        "Teddy Bear",
 				Description: "Soft toy",
 				Quantity:    5,

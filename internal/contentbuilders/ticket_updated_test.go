@@ -10,8 +10,8 @@ import (
 	"github.com/DKhorkov/hmtm-notifications/internal/entities"
 )
 
-func TestUpdateTicketContentBuilder_Subject(t *testing.T) {
-	builder := NewUpdateTicketContentBuilder("http://example.com/update-ticket")
+func TestTicketUpdatedContentBuilder_Subject(t *testing.T) {
+	builder := NewTicketUpdatedContentBuilder("http://example.com/update-ticket")
 
 	testCases := []struct {
 		name     string
@@ -42,8 +42,8 @@ func TestUpdateTicketContentBuilder_Subject(t *testing.T) {
 	}
 }
 
-func TestUpdateTicketContentBuilder_Body(t *testing.T) {
-	builder := NewUpdateTicketContentBuilder("http://example.com/update-ticket")
+func TestTicketUpdatedContentBuilder_Body(t *testing.T) {
+	builder := NewTicketUpdatedContentBuilder("http://example.com/update-ticket")
 
 	testCases := []struct {
 		name         string

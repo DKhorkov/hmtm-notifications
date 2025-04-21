@@ -99,7 +99,7 @@ func (useCases *UseCases) SendForgetPasswordEmailCommunication(
 	return useCases.emailsService.SaveCommunication(ctx, emailCommunication)
 }
 
-func (useCases *UseCases) SendUpdateTicketEmailCommunication(
+func (useCases *UseCases) SendTicketUpdatedEmailCommunication(
 	ctx context.Context,
 	ticketID uint64,
 ) ([]uint64, error) {
@@ -128,8 +128,8 @@ func (useCases *UseCases) SendUpdateTicketEmailCommunication(
 
 		if err = useCases.senders.Email.Send(
 			ctx,
-			useCases.contentBuilders.UpdateTicket.Subject(*rawTicket),
-			useCases.contentBuilders.UpdateTicket.Body(*rawTicket, *respondOwner),
+			useCases.contentBuilders.TicketUpdated.Subject(*rawTicket),
+			useCases.contentBuilders.TicketUpdated.Body(*rawTicket, *respondOwner),
 			[]string{respondOwner.Email},
 		); err != nil {
 			return nil, err
@@ -138,7 +138,7 @@ func (useCases *UseCases) SendUpdateTicketEmailCommunication(
 		emailCommunication := entities.Email{
 			UserID:  respondOwner.ID,
 			Email:   respondOwner.Email,
-			Content: useCases.contentBuilders.UpdateTicket.Body(*rawTicket, *respondOwner),
+			Content: useCases.contentBuilders.TicketUpdated.Body(*rawTicket, *respondOwner),
 			SentAt:  time.Now().UTC(),
 		}
 
@@ -153,9 +153,9 @@ func (useCases *UseCases) SendUpdateTicketEmailCommunication(
 	return emailIDs, nil
 }
 
-func (useCases *UseCases) SendDeleteTicketEmailCommunication(
+func (useCases *UseCases) SendTicketDeletedEmailCommunication(
 	ctx context.Context,
-	ticketData dto.DeleteTicketDTO,
+	ticketData dto.TicketDeletedDTO,
 ) ([]uint64, error) {
 	ticketOwner, err := useCases.ssoService.GetUserByID(ctx, ticketData.TicketOwnerID)
 	if err != nil {
@@ -177,8 +177,8 @@ func (useCases *UseCases) SendDeleteTicketEmailCommunication(
 
 		if err = useCases.senders.Email.Send(
 			ctx,
-			useCases.contentBuilders.DeleteTicket.Subject(ticketData),
-			useCases.contentBuilders.DeleteTicket.Body(ticketData, *ticketOwner, *respondOwner),
+			useCases.contentBuilders.TicketDeleted.Subject(ticketData),
+			useCases.contentBuilders.TicketDeleted.Body(ticketData, *ticketOwner, *respondOwner),
 			[]string{respondOwner.Email},
 		); err != nil {
 			return nil, err
@@ -187,7 +187,7 @@ func (useCases *UseCases) SendDeleteTicketEmailCommunication(
 		emailCommunication := entities.Email{
 			UserID: respondOwner.ID,
 			Email:  respondOwner.Email,
-			Content: useCases.contentBuilders.DeleteTicket.Body(
+			Content: useCases.contentBuilders.TicketDeleted.Body(
 				ticketData,
 				*ticketOwner,
 				*respondOwner,

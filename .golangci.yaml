@@ -119,16 +119,16 @@ linters:
       - path: "internal/workers/handlers/builders/verify_email.go"
         linters:
           - dupl
-      - path: "internal/workers/handlers/builders/update_ticket.go"
+      - path: "internal/workers/handlers/builders/ticket_updated.go"
         linters:
           - dupl
       - path: "internal/workers/handlers/builders/forget_password.go"
         linters:
           - dupl
-      - path: "cmd/publishers/deleteticket/delete_ticket.go"
+      - path: "cmd/publishers/deleteticket/ticket_deleted.go"
         linters:
           - mnd
-      - path: "cmd/publishers/updateticket/update_ticket.go"
+      - path: "cmd/publishers/updateticket/ticket_updated.go"
         linters:
           - mnd
       - path: "cmd/publishers/forgetpassword/forget_password.go"

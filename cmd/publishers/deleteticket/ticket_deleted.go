@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"time"
 
+	"github.com/DKhorkov/libs/pointers"
 	"github.com/nats-io/nats.go"
 
 	customnats "github.com/DKhorkov/libs/nats"
@@ -23,16 +24,21 @@ func main() {
 		panic(err)
 	}
 
-	updateTicketDTO := dto.UpdateTicketDTO{
-		TicketID: 1,
+	ticketDeletedDTO := dto.TicketDeletedDTO{
+		TicketOwnerID:       1,
+		Name:                "test ticket",
+		Description:         "test description",
+		Price:               pointers.New[float32](112),
+		Quantity:            1,
+		RespondedMastersIDs: []uint64{1},
 	}
 
-	content, err := json.Marshal(updateTicketDTO)
+	content, err := json.Marshal(ticketDeletedDTO)
 	if err != nil {
 		panic(err)
 	}
 
-	err = natsPublisher.Publish(settings.NATS.Subjects.UpdateTicket, content)
+	err = natsPublisher.Publish(settings.NATS.Subjects.TicketDeleted, content)
 	if err != nil {
 		panic(err)
 	}
