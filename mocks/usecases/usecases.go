@@ -57,21 +57,6 @@ func (mr *MockUseCasesMockRecorder) GetUserEmailCommunications(ctx, userID any) 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserEmailCommunications", reflect.TypeOf((*MockUseCases)(nil).GetUserEmailCommunications), ctx, userID)
 }
 
-// SendDeleteTicketEmailCommunication mocks base method.
-func (m *MockUseCases) SendDeleteTicketEmailCommunication(ctx context.Context, ticketData dto.DeleteTicketDTO) ([]uint64, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SendDeleteTicketEmailCommunication", ctx, ticketData)
-	ret0, _ := ret[0].([]uint64)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// SendDeleteTicketEmailCommunication indicates an expected call of SendDeleteTicketEmailCommunication.
-func (mr *MockUseCasesMockRecorder) SendDeleteTicketEmailCommunication(ctx, ticketData any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SendDeleteTicketEmailCommunication", reflect.TypeOf((*MockUseCases)(nil).SendDeleteTicketEmailCommunication), ctx, ticketData)
-}
-
 // SendForgetPasswordEmailCommunication mocks base method.
 func (m *MockUseCases) SendForgetPasswordEmailCommunication(ctx context.Context, userID uint64) (uint64, error) {
 	m.ctrl.T.Helper()
@@ -87,19 +72,34 @@ func (mr *MockUseCasesMockRecorder) SendForgetPasswordEmailCommunication(ctx, us
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SendForgetPasswordEmailCommunication", reflect.TypeOf((*MockUseCases)(nil).SendForgetPasswordEmailCommunication), ctx, userID)
 }
 
-// SendUpdateTicketEmailCommunication mocks base method.
-func (m *MockUseCases) SendUpdateTicketEmailCommunication(ctx context.Context, ticketID uint64) ([]uint64, error) {
+// SendTicketDeletedEmailCommunication mocks base method.
+func (m *MockUseCases) SendTicketDeletedEmailCommunication(ctx context.Context, ticketData dto.TicketDeletedDTO) ([]uint64, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SendUpdateTicketEmailCommunication", ctx, ticketID)
+	ret := m.ctrl.Call(m, "SendTicketDeletedEmailCommunication", ctx, ticketData)
 	ret0, _ := ret[0].([]uint64)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// SendUpdateTicketEmailCommunication indicates an expected call of SendUpdateTicketEmailCommunication.
-func (mr *MockUseCasesMockRecorder) SendUpdateTicketEmailCommunication(ctx, ticketID any) *gomock.Call {
+// SendTicketDeletedEmailCommunication indicates an expected call of SendTicketDeletedEmailCommunication.
+func (mr *MockUseCasesMockRecorder) SendTicketDeletedEmailCommunication(ctx, ticketData any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SendUpdateTicketEmailCommunication", reflect.TypeOf((*MockUseCases)(nil).SendUpdateTicketEmailCommunication), ctx, ticketID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SendTicketDeletedEmailCommunication", reflect.TypeOf((*MockUseCases)(nil).SendTicketDeletedEmailCommunication), ctx, ticketData)
+}
+
+// SendTicketUpdatedEmailCommunication mocks base method.
+func (m *MockUseCases) SendTicketUpdatedEmailCommunication(ctx context.Context, ticketID uint64) ([]uint64, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SendTicketUpdatedEmailCommunication", ctx, ticketID)
+	ret0, _ := ret[0].([]uint64)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// SendTicketUpdatedEmailCommunication indicates an expected call of SendTicketUpdatedEmailCommunication.
+func (mr *MockUseCasesMockRecorder) SendTicketUpdatedEmailCommunication(ctx, ticketID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SendTicketUpdatedEmailCommunication", reflect.TypeOf((*MockUseCases)(nil).SendTicketUpdatedEmailCommunication), ctx, ticketID)
 }
 
 // SendVerifyEmailCommunication mocks base method.

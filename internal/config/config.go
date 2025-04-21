@@ -320,7 +320,7 @@ func New() Config {
 							},
 						},
 					},
-					UpdateTicket: tracing.SpanConfig{
+					TicketUpdated: tracing.SpanConfig{
 						Opts: []trace.SpanStartOption{
 							trace.WithAttributes(
 								attribute.String(
@@ -354,7 +354,7 @@ func New() Config {
 							},
 						},
 					},
-					DeleteTicket: tracing.SpanConfig{
+					TicketDeleted: tracing.SpanConfig{
 						Opts: []trace.SpanStartOption{
 							trace.WithAttributes(
 								attribute.String(
@@ -438,8 +438,8 @@ func New() Config {
 			Subjects: NATSSubjects{
 				VerifyEmail:    loadenv.GetEnv("NATS_VERIFY_EMAIL_SUBJECT", "verify-email"),
 				ForgetPassword: loadenv.GetEnv("NATS_FORGET_PASSWORD_SUBJECT", "forget-password"),
-				UpdateTicket:   loadenv.GetEnv("NATS_UPDATE_TICKET_SUBJECT", "update-ticket"),
-				DeleteTicket:   loadenv.GetEnv("NATS_DELETE_TICKET_SUBJECT", "delete-ticket"),
+				TicketUpdated:  loadenv.GetEnv("NATS_TICKET_UPDATED_SUBJECT", "ticket-updated"),
+				TicketDeleted:  loadenv.GetEnv("NATS_TICKET_DELETED_SUBJECT", "ticket-deleted"),
 			},
 			Workers: NATSWorkers{
 				VerifyEmail: NATSWorker{
@@ -451,11 +451,11 @@ func New() Config {
 						"forget-password-worker",
 					),
 				},
-				UpdateTicket: NATSWorker{
-					Name: loadenv.GetEnv("NATS_UPDATE_TICKET_WORKER_NAME", "update-ticket-worker"),
+				TicketUpdated: NATSWorker{
+					Name: loadenv.GetEnv("NATS_TICKET_UPDATED_WORKER_NAME", "ticket-updated-worker"),
 				},
-				DeleteTicket: NATSWorker{
-					Name: loadenv.GetEnv("NATS_DELETE_TICKET_WORKER_NAME", "delete-ticket-worker"),
+				TicketDeleted: NATSWorker{
+					Name: loadenv.GetEnv("NATS_TICKET_DELETED_WORKER_NAME", "ticket-deleted-worker"),
 				},
 			},
 		},
@@ -467,15 +467,15 @@ func New() Config {
 				Password: loadenv.GetEnv("EMAIL_SMTP_PASSWORD", "smtp"),
 			},
 			VerifyEmailURL: loadenv.GetEnv(
-				"EMAIL_VERIFY_URL",
+				"VERIFY_EMAIL_URL",
 				"http://localhost:8090/sso/verify-email",
 			),
 			ForgetPasswordURL: loadenv.GetEnv(
 				"FORGET_PASSWORD_URL",
 				"http://localhost:8090/sso/forget-password",
 			),
-			UpdateTicketURL: loadenv.GetEnv("UPDATE_TICKET_URL", "http://localhost:8090/tickets"),
-			DeleteTicketURL: loadenv.GetEnv("UPDATE_TICKET_URL", "http://localhost:8090/users"),
+			TicketUpdatedURL: loadenv.GetEnv("TICKET_UPDATED_URL", "http://localhost:8090/tickets"),
+			TicketDeletedURL: loadenv.GetEnv("TICKET_DELETED_URL", "http://localhost:8090/users"),
 		},
 	}
 }
@@ -514,8 +514,8 @@ type SpansConfig struct {
 type SpanHandlers struct {
 	VerifyEmail    tracing.SpanConfig
 	ForgetPassword tracing.SpanConfig
-	UpdateTicket   tracing.SpanConfig
-	DeleteTicket   tracing.SpanConfig
+	TicketUpdated  tracing.SpanConfig
+	TicketDeleted  tracing.SpanConfig
 }
 
 type SpanSenders struct {
@@ -543,15 +543,15 @@ type NATSConfig struct {
 type NATSSubjects struct {
 	VerifyEmail    string
 	ForgetPassword string
-	UpdateTicket   string
-	DeleteTicket   string
+	TicketUpdated  string
+	TicketDeleted  string
 }
 
 type NATSWorkers struct {
 	VerifyEmail    NATSWorker
 	ForgetPassword NATSWorker
-	UpdateTicket   NATSWorker
-	DeleteTicket   NATSWorker
+	TicketUpdated  NATSWorker
+	TicketDeleted  NATSWorker
 }
 
 type NATSWorker struct {
@@ -562,8 +562,8 @@ type EmailConfig struct {
 	SMTP              SMTPConfig
 	VerifyEmailURL    string
 	ForgetPasswordURL string
-	UpdateTicketURL   string
-	DeleteTicketURL   string
+	TicketUpdatedURL  string
+	TicketDeletedURL  string
 }
 
 type SMTPConfig struct {

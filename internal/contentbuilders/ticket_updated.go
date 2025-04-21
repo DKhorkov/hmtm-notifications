@@ -7,30 +7,30 @@ import (
 	"github.com/DKhorkov/hmtm-notifications/internal/entities"
 )
 
-type UpdateTicketContentBuilder struct {
-	updateTicketURLBase string
+type TicketUpdatedContentBuilder struct {
+	ticketUpdatedURLBase string
 }
 
-func NewUpdateTicketContentBuilder(updateTicketURLBase string) *UpdateTicketContentBuilder {
-	return &UpdateTicketContentBuilder{
-		updateTicketURLBase: updateTicketURLBase,
+func NewTicketUpdatedContentBuilder(ticketUpdatedURLBase string) *TicketUpdatedContentBuilder {
+	return &TicketUpdatedContentBuilder{
+		ticketUpdatedURLBase: ticketUpdatedURLBase,
 	}
 }
 
-func (b *UpdateTicketContentBuilder) Subject(ticket entities.RawTicket) string {
+func (b *TicketUpdatedContentBuilder) Subject(ticket entities.RawTicket) string {
 	return fmt.Sprintf(
 		"Заявка на создание игрушки %s была изменена",
 		ticket.Name,
 	)
 }
 
-func (b *UpdateTicketContentBuilder) Body(
+func (b *TicketUpdatedContentBuilder) Body(
 	ticket entities.RawTicket,
 	respondOwner entities.User,
 ) string {
 	link := fmt.Sprintf(
 		"%s/%s",
-		b.updateTicketURLBase,
+		b.ticketUpdatedURLBase,
 		strconv.FormatUint(ticket.ID, 10),
 	)
 

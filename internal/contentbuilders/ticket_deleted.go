@@ -8,31 +8,31 @@ import (
 	"github.com/DKhorkov/hmtm-notifications/internal/entities"
 )
 
-type DeleteTicketContentBuilder struct {
-	deleteTicketURLBase string
+type TicketDeletedContentBuilder struct {
+	ticketDeleteURLBase string
 }
 
-func NewDeleteTicketContentBuilder(deleteTicketURLBase string) *DeleteTicketContentBuilder {
-	return &DeleteTicketContentBuilder{
-		deleteTicketURLBase: deleteTicketURLBase,
+func NewTicketDeletedContentBuilder(ticketDeleteURLBase string) *TicketDeletedContentBuilder {
+	return &TicketDeletedContentBuilder{
+		ticketDeleteURLBase: ticketDeleteURLBase,
 	}
 }
 
-func (b *DeleteTicketContentBuilder) Subject(ticketData dto.DeleteTicketDTO) string {
+func (b *TicketDeletedContentBuilder) Subject(ticketData dto.TicketDeletedDTO) string {
 	return fmt.Sprintf(
 		"Заявка на создание игрушки %s была удалена",
 		ticketData.Name,
 	)
 }
 
-func (b *DeleteTicketContentBuilder) Body(
-	ticketData dto.DeleteTicketDTO,
+func (b *TicketDeletedContentBuilder) Body(
+	ticketData dto.TicketDeletedDTO,
 	ticketOwner entities.User,
 	respondOwner entities.User,
 ) string {
 	link := fmt.Sprintf(
 		"%s/%s",
-		b.deleteTicketURLBase,
+		b.ticketDeleteURLBase,
 		strconv.FormatUint(ticketOwner.ID, 10),
 	)
 

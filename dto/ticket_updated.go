@@ -1,5 +1,5 @@
 package dto
 
-type UpdateTicketDTO struct {
+type TicketUpdatedDTO struct {
 	TicketID uint64 `json:"ticketId"`
 }

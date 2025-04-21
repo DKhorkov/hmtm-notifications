@@ -139,11 +139,11 @@ func main() {
 		ForgetPassword: contentbuilders.NewForgetPasswordContentBuilder(
 			settings.Email.ForgetPasswordURL,
 		),
-		UpdateTicket: contentbuilders.NewUpdateTicketContentBuilder(
-			settings.Email.UpdateTicketURL,
+		TicketUpdated: contentbuilders.NewTicketUpdatedContentBuilder(
+			settings.Email.TicketUpdatedURL,
 		),
-		DeleteTicket: contentbuilders.NewDeleteTicketContentBuilder(
-			settings.Email.DeleteTicketURL,
+		TicketDeleted: contentbuilders.NewTicketDeletedContentBuilder(
+			settings.Email.TicketDeletedURL,
 		),
 	}
 
@@ -245,17 +245,17 @@ func main() {
 		}
 	}()
 
-	updateTicketWorker, err := customnats.NewWorker(
+	ticketUpdatedWorker, err := customnats.NewWorker(
 		settings.NATS.ClientURL,
-		settings.NATS.Subjects.UpdateTicket,
+		settings.NATS.Subjects.TicketUpdated,
 		customnats.WithGoroutinesPoolSize(settings.NATS.GoroutinesPoolSize),
 		customnats.WithMessageChannelBufferSize(settings.NATS.MessageChannelBufferSize),
-		customnats.WithNatsOptions(nats.Name(settings.NATS.Workers.UpdateTicket.Name)),
+		customnats.WithNatsOptions(nats.Name(settings.NATS.Workers.TicketUpdated.Name)),
 		customnats.WithMessageHandler(
-			builders.NewUpdateTicketBuilder(
+			builders.NewTicketUpdatedBuilder(
 				useCases,
 				traceProvider,
-				settings.Tracing.Spans.Handlers.UpdateTicket,
+				settings.Tracing.Spans.Handlers.TicketUpdated,
 				logger,
 			).MessageHandler(),
 		),
@@ -264,34 +264,34 @@ func main() {
 		panic(err)
 	}
 
-	if err = updateTicketWorker.Run(); err != nil {
+	if err = ticketUpdatedWorker.Run(); err != nil {
 		panic(err)
 	}
 
 	defer func() {
-		if err = updateTicketWorker.Stop(); err != nil {
+		if err = ticketUpdatedWorker.Stop(); err != nil {
 			logging.LogError(
 				logger,
 				fmt.Sprintf(
 					"Error shutting down \"%s\" worker",
-					settings.NATS.Workers.UpdateTicket.Name,
+					settings.NATS.Workers.TicketUpdated.Name,
 				),
 				err,
 			)
 		}
 	}()
 
-	deleteTicketWorker, err := customnats.NewWorker(
+	ticketDeletedWorker, err := customnats.NewWorker(
 		settings.NATS.ClientURL,
-		settings.NATS.Subjects.DeleteTicket,
+		settings.NATS.Subjects.TicketDeleted,
 		customnats.WithGoroutinesPoolSize(settings.NATS.GoroutinesPoolSize),
 		customnats.WithMessageChannelBufferSize(settings.NATS.MessageChannelBufferSize),
-		customnats.WithNatsOptions(nats.Name(settings.NATS.Workers.DeleteTicket.Name)),
+		customnats.WithNatsOptions(nats.Name(settings.NATS.Workers.TicketDeleted.Name)),
 		customnats.WithMessageHandler(
-			builders.NewDeleteTicketBuilder(
+			builders.NewTicketDeletedBuilder(
 				useCases,
 				traceProvider,
-				settings.Tracing.Spans.Handlers.DeleteTicket,
+				settings.Tracing.Spans.Handlers.TicketDeleted,
 				logger,
 			).MessageHandler(),
 		),
@@ -300,17 +300,17 @@ func main() {
 		panic(err)
 	}
 
-	if err = deleteTicketWorker.Run(); err != nil {
+	if err = ticketDeletedWorker.Run(); err != nil {
 		panic(err)
 	}
 
 	defer func() {
-		if err = deleteTicketWorker.Stop(); err != nil {
+		if err = ticketDeletedWorker.Stop(); err != nil {
 			logging.LogError(
 				logger,
 				fmt.Sprintf(
 					"Error shutting down \"%s\" worker",
-					settings.NATS.Workers.DeleteTicket.Name,
+					settings.NATS.Workers.TicketDeleted.Name,
 				),
 				err,
 			)

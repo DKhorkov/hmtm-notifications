@@ -1,6 +1,6 @@
 package dto
 
-type DeleteTicketDTO struct {
+type TicketDeletedDTO struct {
 	TicketOwnerID       uint64   `json:"ticketOwnerId"`
 	Name                string   `json:"name"`
 	Description         string   `json:"description"`

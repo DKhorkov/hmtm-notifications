@@ -11,24 +11,24 @@ import (
 	"github.com/DKhorkov/hmtm-notifications/internal/entities"
 )
 
-func TestDeleteTicketContentBuilder_Subject(t *testing.T) {
-	builder := NewDeleteTicketContentBuilder("http://example.com/delete-ticket")
+func TestTicketDeletedContentBuilder_Subject(t *testing.T) {
+	builder := NewTicketDeletedContentBuilder("http://example.com/delete-ticket")
 
 	testCases := []struct {
 		name       string
-		ticketData dto.DeleteTicketDTO
+		ticketData dto.TicketDeletedDTO
 		expected   string
 	}{
 		{
 			name: "basic ticket",
-			ticketData: dto.DeleteTicketDTO{
+			ticketData: dto.TicketDeletedDTO{
 				Name: "Teddy Bear",
 			},
 			expected: "Заявка на создание игрушки Teddy Bear была удалена",
 		},
 		{
 			name: "ticket with special characters",
-			ticketData: dto.DeleteTicketDTO{
+			ticketData: dto.TicketDeletedDTO{
 				Name: "Super <Toy> & Fun",
 			},
 			expected: "Заявка на создание игрушки Super <Toy> & Fun была удалена",
@@ -43,19 +43,19 @@ func TestDeleteTicketContentBuilder_Subject(t *testing.T) {
 	}
 }
 
-func TestDeleteTicketContentBuilder_Body(t *testing.T) {
-	builder := NewDeleteTicketContentBuilder("http://example.com/delete-ticket")
+func TestTicketDeletedContentBuilder_Body(t *testing.T) {
+	builder := NewTicketDeletedContentBuilder("http://example.com/delete-ticket")
 
 	testCases := []struct {
 		name         string
-		ticketData   dto.DeleteTicketDTO
+		ticketData   dto.TicketDeletedDTO
 		ticketOwner  entities.User
 		respondOwner entities.User
 		expected     string
 	}{
 		{
 			name: "ticket with price",
-			ticketData: dto.DeleteTicketDTO{
+			ticketData: dto.TicketDeletedDTO{
 				Name:        "Teddy Bear",
 				Description: "A soft teddy bear",
 				Quantity:    5,
@@ -78,7 +78,7 @@ func TestDeleteTicketContentBuilder_Body(t *testing.T) {
 		},
 		{
 			name: "ticket without price",
-			ticketData: dto.DeleteTicketDTO{
+			ticketData: dto.TicketDeletedDTO{
 				Name:        "Wooden Car",
 				Description: "A wooden toy car",
 				Quantity:    1,
@@ -101,7 +101,7 @@ func TestDeleteTicketContentBuilder_Body(t *testing.T) {
 		},
 		{
 			name: "ticket with special characters",
-			ticketData: dto.DeleteTicketDTO{
+			ticketData: dto.TicketDeletedDTO{
 				Name:        "Super <Toy>",
 				Description: "Fun & Games",
 				Quantity:    3,

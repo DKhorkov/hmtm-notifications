@@ -3,6 +3,7 @@ package builders
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 
 	"github.com/DKhorkov/libs/logging"
 	"github.com/DKhorkov/libs/tracing"
@@ -14,20 +15,20 @@ import (
 	"github.com/DKhorkov/hmtm-notifications/internal/workers/handlers/helpers"
 )
 
-type DeleteTicketBuilder struct {
+type TicketUpdatedBuilder struct {
 	useCases      interfaces.UseCases
 	traceProvider tracing.Provider
 	spanConfig    tracing.SpanConfig
 	logger        logging.Logger
 }
 
-func NewDeleteTicketBuilder(
+func NewTicketUpdatedBuilder(
 	useCases interfaces.UseCases,
 	traceProvider tracing.Provider,
 	spanConfig tracing.SpanConfig,
 	logger logging.Logger,
-) *DeleteTicketBuilder {
-	return &DeleteTicketBuilder{
+) *TicketUpdatedBuilder {
+	return &TicketUpdatedBuilder{
 		useCases:      useCases,
 		traceProvider: traceProvider,
 		spanConfig:    spanConfig,
@@ -35,7 +36,7 @@ func NewDeleteTicketBuilder(
 	}
 }
 
-func (b *DeleteTicketBuilder) MessageHandler() handlers.MessageHandler {
+func (b *TicketUpdatedBuilder) MessageHandler() handlers.MessageHandler {
 	return func(message *nats.Msg) {
 		ctx, span := b.traceProvider.Span(
 			context.Background(),
@@ -48,31 +49,34 @@ func (b *DeleteTicketBuilder) MessageHandler() handlers.MessageHandler {
 
 		ctx = helpers.AddTraceIDToContext(ctx, span)
 
-		deleteTicketDTO := b.natsMessageToDTO(message)
-		if deleteTicketDTO == nil {
+		ticketUpdatedDTO := b.natsMessageToDTO(message)
+		if ticketUpdatedDTO == nil {
 			return
 		}
 
-		if _, err := b.useCases.SendDeleteTicketEmailCommunication(
+		if _, err := b.useCases.SendTicketUpdatedEmailCommunication(
 			ctx,
-			*deleteTicketDTO,
+			ticketUpdatedDTO.TicketID,
 		); err != nil {
 			logging.LogError(
 				b.logger,
-				"Failed to send delete-ticket message",
+				fmt.Sprintf(
+					"Failed to send update-ticket message for Ticket with ID=%d ",
+					ticketUpdatedDTO.TicketID,
+				),
 				err,
 			)
 		}
 	}
 }
 
-func (b *DeleteTicketBuilder) natsMessageToDTO(message *nats.Msg) *dto.DeleteTicketDTO {
-	var deleteTicketDTO dto.DeleteTicketDTO
-	if err := json.Unmarshal(message.Data, &deleteTicketDTO); err != nil {
-		logging.LogError(b.logger, "Failed to unmarshal delete-ticket message", err)
+func (b *TicketUpdatedBuilder) natsMessageToDTO(message *nats.Msg) *dto.TicketUpdatedDTO {
+	var ticketUpdatedDTO dto.TicketUpdatedDTO
+	if err := json.Unmarshal(message.Data, &ticketUpdatedDTO); err != nil {
+		logging.LogError(b.logger, "Failed to unmarshal update-ticket message", err)
 
 		return nil
 	}
 
-	return &deleteTicketDTO
+	return &ticketUpdatedDTO
 }
