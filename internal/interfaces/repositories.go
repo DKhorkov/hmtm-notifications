@@ -16,7 +16,6 @@ type EmailsRepository interface {
 type SsoRepository interface {
 	GetUserByID(ctx context.Context, id uint64) (*entities.User, error)
 	GetUserByEmail(ctx context.Context, email string) (*entities.User, error)
-	GetAllUsers(ctx context.Context) ([]entities.User, error)
 }
 
 //go:generate mockgen -source=repositories.go -destination=../../mocks/repositories/tickets_repository.go -exclude_interfaces=ToysRepository,EmailsRepository,SsoRepository -package=mockrepositories

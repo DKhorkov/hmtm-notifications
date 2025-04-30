@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/DKhorkov/hmtm-sso/api/protobuf/generated/go/sso"
-	"google.golang.org/protobuf/types/known/emptypb"
 
 	"github.com/DKhorkov/hmtm-notifications/internal/entities"
 	"github.com/DKhorkov/hmtm-notifications/internal/interfaces"
@@ -30,23 +29,6 @@ func (repo *SsoRepository) GetUserByID(ctx context.Context, id uint64) (*entitie
 	}
 
 	return repo.processUserResponse(response), nil
-}
-
-func (repo *SsoRepository) GetAllUsers(ctx context.Context) ([]entities.User, error) {
-	response, err := repo.client.GetUsers(
-		ctx,
-		&emptypb.Empty{},
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	users := make([]entities.User, len(response.GetUsers()))
-	for i, userResponse := range response.GetUsers() {
-		users[i] = *repo.processUserResponse(userResponse)
-	}
-
-	return users, nil
 }
 
 func (repo *SsoRepository) GetUserByEmail(
