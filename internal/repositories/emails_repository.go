@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"context"
+	"fmt"
 	"sync"
 
 	"github.com/DKhorkov/libs/db"
@@ -22,6 +23,8 @@ const (
 	emailContentColumnName = "content"
 	emailSentAtColumnName  = "sent_at"
 	returningIDSuffix      = "RETURNING id"
+	DESC                   = "DESC"
+	ASC                    = "ASC"
 )
 
 type EmailsRepository struct {
@@ -68,6 +71,7 @@ func (repo *EmailsRepository) GetUserCommunications(
 		Select(selectAllColumns).
 		From(emailsTableName).
 		Where(sq.Eq{userIDColumnName: userID}).
+		OrderBy(fmt.Sprintf("%s %s", idColumnName, DESC)).
 		PlaceholderFormat(sq.Dollar).
 		ToSql()
 	if err != nil {
