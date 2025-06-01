@@ -63,6 +63,7 @@ linters:
         linters:
           - mnd
           - govet
+          - exhaustruct
       - path: "internal/config/config.go"
         linters:
           - nosprintfhostport
@@ -90,6 +91,7 @@ linters:
         linters:
           - funlen
           - exhaustruct
+          - cyclop
       - path: "internal/clients/sso/grpc/client.go"
         linters:
           - gosec

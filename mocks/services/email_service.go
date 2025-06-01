@@ -41,19 +41,34 @@ func (m *MockEmailsService) EXPECT() *MockEmailsServiceMockRecorder {
 	return m.recorder
 }
 
-// GetUserCommunications mocks base method.
-func (m *MockEmailsService) GetUserCommunications(ctx context.Context, userID uint64) ([]entities.Email, error) {
+// CountUserCommunications mocks base method.
+func (m *MockEmailsService) CountUserCommunications(ctx context.Context, userID uint64) (uint64, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetUserCommunications", ctx, userID)
+	ret := m.ctrl.Call(m, "CountUserCommunications", ctx, userID)
+	ret0, _ := ret[0].(uint64)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CountUserCommunications indicates an expected call of CountUserCommunications.
+func (mr *MockEmailsServiceMockRecorder) CountUserCommunications(ctx, userID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CountUserCommunications", reflect.TypeOf((*MockEmailsService)(nil).CountUserCommunications), ctx, userID)
+}
+
+// GetUserCommunications mocks base method.
+func (m *MockEmailsService) GetUserCommunications(ctx context.Context, userID uint64, pagination *entities.Pagination) ([]entities.Email, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetUserCommunications", ctx, userID, pagination)
 	ret0, _ := ret[0].([]entities.Email)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetUserCommunications indicates an expected call of GetUserCommunications.
-func (mr *MockEmailsServiceMockRecorder) GetUserCommunications(ctx, userID any) *gomock.Call {
+func (mr *MockEmailsServiceMockRecorder) GetUserCommunications(ctx, userID, pagination any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserCommunications", reflect.TypeOf((*MockEmailsService)(nil).GetUserCommunications), ctx, userID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserCommunications", reflect.TypeOf((*MockEmailsService)(nil).GetUserCommunications), ctx, userID, pagination)
 }
 
 // SaveCommunication mocks base method.

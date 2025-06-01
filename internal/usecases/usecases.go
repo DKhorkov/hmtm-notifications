@@ -39,8 +39,16 @@ type UseCases struct {
 func (useCases *UseCases) GetUserEmailCommunications(
 	ctx context.Context,
 	userID uint64,
+	pagination *entities.Pagination,
 ) ([]entities.Email, error) {
-	return useCases.emailsService.GetUserCommunications(ctx, userID)
+	return useCases.emailsService.GetUserCommunications(ctx, userID, pagination)
+}
+
+func (useCases *UseCases) CountUserEmailCommunications(
+	ctx context.Context,
+	userID uint64,
+) (uint64, error) {
+	return useCases.emailsService.CountUserCommunications(ctx, userID)
 }
 
 func (useCases *UseCases) SendVerifyEmailCommunication(

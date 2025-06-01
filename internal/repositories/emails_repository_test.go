@@ -18,6 +18,7 @@ import (
 
 	"github.com/DKhorkov/libs/db"
 	mocklogging "github.com/DKhorkov/libs/logging/mocks"
+	"github.com/DKhorkov/libs/pointers"
 	"github.com/DKhorkov/libs/tracing"
 	mocktracing "github.com/DKhorkov/libs/tracing/mocks"
 
@@ -127,13 +128,79 @@ func (s *EmailsRepositoryTestSuite) TestGetUserCommunicationsWithExistingEmails(
 	)
 	s.NoError(err)
 
-	emails, err := s.emailsRepository.GetUserCommunications(s.ctx, userID)
+	emails, err := s.emailsRepository.GetUserCommunications(s.ctx, userID, nil)
 	s.NoError(err)
 	s.NotEmpty(emails)
 	s.Equal(1, len(emails))
 	s.Equal(userID, emails[0].UserID)
 	s.Equal("test@example.com", emails[0].Email)
 	s.Equal("Test email content", emails[0].Content)
+	s.WithinDuration(sentAt, emails[0].SentAt, time.Second)
+}
+
+func (s *EmailsRepositoryTestSuite) TestCountUserCommunications() {
+	s.traceProvider.
+		EXPECT().
+		Span(gomock.Any(), gomock.Any()).
+		Return(context.Background(), mocktracing.NewMockSpan()).
+		Times(1)
+
+	id := 1
+	userID := uint64(1)
+	sentAt := time.Now().UTC()
+	_, err := s.connection.ExecContext(
+		s.ctx,
+		`
+			INSERT INTO emails (id, user_id, email, content, sent_at) 
+			VALUES ($1, $2, $3, $4, $5)
+		`,
+		id,
+		userID,
+		"test@example.com",
+		"Test email content",
+		sentAt,
+	)
+	s.NoError(err)
+
+	count, err := s.emailsRepository.CountUserCommunications(s.ctx, userID)
+	s.NoError(err)
+	s.NotZero(count)
+	s.Equal(uint64(1), count)
+}
+
+func (s *EmailsRepositoryTestSuite) TestGetUserCommunicationsWithExistingEmailsAndPagination() {
+	s.traceProvider.
+		EXPECT().
+		Span(gomock.Any(), gomock.Any()).
+		Return(context.Background(), mocktracing.NewMockSpan()).
+		Times(1)
+
+	userID := uint64(1)
+	sentAt := time.Now().UTC()
+	_, err := s.connection.ExecContext(
+		s.ctx,
+		`
+			INSERT INTO emails (id, user_id, email, content, sent_at) 
+			VALUES ($1, $2, $3, $4, $5), ($6, $7, $8, $9, $10), ($11, $12, $13, $14, $15)
+		`,
+		1, userID, "test@example.com", "Test email content 1", sentAt,
+		2, userID, "test@example.com", "Test email content 2", sentAt,
+		3, userID, "test@example.com", "Test email content 3", sentAt,
+	)
+	s.NoError(err)
+
+	pagination := &entities.Pagination{
+		Limit:  pointers.New[uint64](1),
+		Offset: pointers.New[uint64](1),
+	}
+
+	emails, err := s.emailsRepository.GetUserCommunications(s.ctx, userID, pagination)
+	s.NoError(err)
+	s.NotEmpty(emails)
+	s.Equal(1, len(emails))
+	s.Equal(userID, emails[0].UserID)
+	s.Equal("test@example.com", emails[0].Email)
+	s.Equal("Test email content 2", emails[0].Content)
 	s.WithinDuration(sentAt, emails[0].SentAt, time.Second)
 }
 
@@ -145,7 +212,7 @@ func (s *EmailsRepositoryTestSuite) TestGetUserCommunicationsWithoutExistingEmai
 		Times(1)
 
 	userID := uint64(2)
-	emails, err := s.emailsRepository.GetUserCommunications(s.ctx, userID)
+	emails, err := s.emailsRepository.GetUserCommunications(s.ctx, userID, nil)
 	s.NoError(err)
 	s.Empty(emails)
 }

@@ -19,6 +19,7 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type EmailsServiceClient interface {
 	GetUserEmailCommunications(ctx context.Context, in *GetUserEmailCommunicationsIn, opts ...grpc.CallOption) (*GetUserEmailCommunicationsOut, error)
+	CountUserEmailCommunications(ctx context.Context, in *CountUserEmailCommunicationsIn, opts ...grpc.CallOption) (*CountOut, error)
 }
 
 type emailsServiceClient struct {
@@ -38,11 +39,21 @@ func (c *emailsServiceClient) GetUserEmailCommunications(ctx context.Context, in
 	return out, nil
 }
 
+func (c *emailsServiceClient) CountUserEmailCommunications(ctx context.Context, in *CountUserEmailCommunicationsIn, opts ...grpc.CallOption) (*CountOut, error) {
+	out := new(CountOut)
+	err := c.cc.Invoke(ctx, "/emails.EmailsService/CountUserEmailCommunications", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // EmailsServiceServer is the server API for EmailsService service.
 // All implementations must embed UnimplementedEmailsServiceServer
 // for forward compatibility
 type EmailsServiceServer interface {
 	GetUserEmailCommunications(context.Context, *GetUserEmailCommunicationsIn) (*GetUserEmailCommunicationsOut, error)
+	CountUserEmailCommunications(context.Context, *CountUserEmailCommunicationsIn) (*CountOut, error)
 	mustEmbedUnimplementedEmailsServiceServer()
 }
 
@@ -52,6 +63,9 @@ type UnimplementedEmailsServiceServer struct {
 
 func (UnimplementedEmailsServiceServer) GetUserEmailCommunications(context.Context, *GetUserEmailCommunicationsIn) (*GetUserEmailCommunicationsOut, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUserEmailCommunications not implemented")
+}
+func (UnimplementedEmailsServiceServer) CountUserEmailCommunications(context.Context, *CountUserEmailCommunicationsIn) (*CountOut, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CountUserEmailCommunications not implemented")
 }
 func (UnimplementedEmailsServiceServer) mustEmbedUnimplementedEmailsServiceServer() {}
 
@@ -84,6 +98,24 @@ func _EmailsService_GetUserEmailCommunications_Handler(srv interface{}, ctx cont
 	return interceptor(ctx, in, info, handler)
 }
 
+func _EmailsService_CountUserEmailCommunications_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CountUserEmailCommunicationsIn)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(EmailsServiceServer).CountUserEmailCommunications(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/emails.EmailsService/CountUserEmailCommunications",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(EmailsServiceServer).CountUserEmailCommunications(ctx, req.(*CountUserEmailCommunicationsIn))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // EmailsService_ServiceDesc is the grpc.ServiceDesc for EmailsService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -94,6 +126,10 @@ var EmailsService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetUserEmailCommunications",
 			Handler:    _EmailsService_GetUserEmailCommunications_Handler,
+		},
+		{
+			MethodName: "CountUserEmailCommunications",
+			Handler:    _EmailsService_CountUserEmailCommunications_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

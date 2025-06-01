@@ -13,6 +13,7 @@ import (
 
 	customgrpc "github.com/DKhorkov/libs/grpc"
 	mocklogging "github.com/DKhorkov/libs/logging/mocks"
+	"github.com/DKhorkov/libs/pointers"
 
 	"github.com/DKhorkov/hmtm-notifications/api/protobuf/generated/go/notifications"
 	"github.com/DKhorkov/hmtm-notifications/internal/entities"
@@ -38,7 +39,13 @@ func TestServerAPI_GetUserEmailCommunications(t *testing.T) {
 	}{
 		{
 			name: "success with emails",
-			in:   &notifications.GetUserEmailCommunicationsIn{UserID: 1},
+			in: &notifications.GetUserEmailCommunicationsIn{
+				UserID: 1,
+				Pagination: &notifications.Pagination{
+					Limit:  pointers.New[uint64](1),
+					Offset: pointers.New[uint64](1),
+				},
+			},
 			setupMocks: func(useCases *mockusecases.MockUseCases, logger *mocklogging.MockLogger) {
 				emailCommunications := []entities.Email{
 					{
@@ -58,7 +65,14 @@ func TestServerAPI_GetUserEmailCommunications(t *testing.T) {
 				}
 				useCases.
 					EXPECT().
-					GetUserEmailCommunications(gomock.Any(), uint64(1)).
+					GetUserEmailCommunications(
+						gomock.Any(),
+						uint64(1),
+						&entities.Pagination{
+							Limit:  pointers.New[uint64](1),
+							Offset: pointers.New[uint64](1),
+						},
+					).
 					Return(emailCommunications, nil).
 					Times(1)
 			},
@@ -85,11 +99,24 @@ func TestServerAPI_GetUserEmailCommunications(t *testing.T) {
 		},
 		{
 			name: "success with no emails",
-			in:   &notifications.GetUserEmailCommunicationsIn{UserID: 2},
+			in: &notifications.GetUserEmailCommunicationsIn{
+				UserID: 1,
+				Pagination: &notifications.Pagination{
+					Limit:  pointers.New[uint64](1),
+					Offset: pointers.New[uint64](1),
+				},
+			},
 			setupMocks: func(useCases *mockusecases.MockUseCases, logger *mocklogging.MockLogger) {
 				useCases.
 					EXPECT().
-					GetUserEmailCommunications(gomock.Any(), uint64(2)).
+					GetUserEmailCommunications(
+						gomock.Any(),
+						uint64(1),
+						&entities.Pagination{
+							Limit:  pointers.New[uint64](1),
+							Offset: pointers.New[uint64](1),
+						},
+					).
 					Return([]entities.Email{}, nil).
 					Times(1)
 			},
@@ -101,11 +128,24 @@ func TestServerAPI_GetUserEmailCommunications(t *testing.T) {
 		},
 		{
 			name: "internal error",
-			in:   &notifications.GetUserEmailCommunicationsIn{UserID: 3},
+			in: &notifications.GetUserEmailCommunicationsIn{
+				UserID: 1,
+				Pagination: &notifications.Pagination{
+					Limit:  pointers.New[uint64](1),
+					Offset: pointers.New[uint64](1),
+				},
+			},
 			setupMocks: func(useCases *mockusecases.MockUseCases, logger *mocklogging.MockLogger) {
 				useCases.
 					EXPECT().
-					GetUserEmailCommunications(gomock.Any(), uint64(3)).
+					GetUserEmailCommunications(
+						gomock.Any(),
+						uint64(1),
+						&entities.Pagination{
+							Limit:  pointers.New[uint64](1),
+							Offset: pointers.New[uint64](1),
+						},
+					).
 					Return(nil, errors.New("internal error")).
 					Times(1)
 
@@ -126,6 +166,76 @@ func TestServerAPI_GetUserEmailCommunications(t *testing.T) {
 			}
 
 			resp, err := api.GetUserEmailCommunications(context.Background(), tc.in)
+			if tc.errorExpected {
+				require.Error(t, err)
+				require.Equal(t, tc.expectedErr, err)
+				require.Nil(t, resp)
+			} else {
+				require.NoError(t, err)
+				require.Equal(t, tc.expectedOut, resp)
+			}
+		})
+	}
+}
+
+func TestServerAPI_CountUserEmailCommunications(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	useCases := mockusecases.NewMockUseCases(ctrl)
+	logger := mocklogging.NewMockLogger(ctrl)
+	api := &ServerAPI{
+		useCases: useCases,
+		logger:   logger,
+	}
+
+	testCases := []struct {
+		name          string
+		in            *notifications.CountUserEmailCommunicationsIn
+		setupMocks    func(useCases *mockusecases.MockUseCases, logger *mocklogging.MockLogger)
+		expectedOut   *notifications.CountOut
+		expectedErr   error
+		errorExpected bool
+	}{
+		{
+			name: "success",
+			in:   &notifications.CountUserEmailCommunicationsIn{UserID: 1},
+			setupMocks: func(useCases *mockusecases.MockUseCases, logger *mocklogging.MockLogger) {
+				useCases.
+					EXPECT().
+					CountUserEmailCommunications(gomock.Any(), uint64(1)).
+					Return(uint64(1), nil).
+					Times(1)
+			},
+			expectedOut:   &notifications.CountOut{Count: 1},
+			expectedErr:   nil,
+			errorExpected: false,
+		},
+		{
+			name: "error",
+			in:   &notifications.CountUserEmailCommunicationsIn{UserID: 1},
+			setupMocks: func(useCases *mockusecases.MockUseCases, logger *mocklogging.MockLogger) {
+				useCases.
+					EXPECT().
+					CountUserEmailCommunications(gomock.Any(), uint64(1)).
+					Return(uint64(0), errors.New("error")).
+					Times(1)
+
+				logger.
+					EXPECT().
+					ErrorContext(gomock.Any(), gomock.Any(), gomock.Any()).
+					Times(1)
+			},
+			expectedErr:   &customgrpc.BaseError{Status: codes.Internal, Message: "error"},
+			errorExpected: true,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			if tc.setupMocks != nil {
+				tc.setupMocks(useCases, logger)
+			}
+
+			resp, err := api.CountUserEmailCommunications(context.Background(), tc.in)
 			if tc.errorExpected {
 				require.Error(t, err)
 				require.Equal(t, tc.expectedErr, err)

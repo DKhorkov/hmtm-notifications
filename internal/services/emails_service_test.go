@@ -11,6 +11,7 @@ import (
 	"go.uber.org/mock/gomock"
 
 	mocklogging "github.com/DKhorkov/libs/logging/mocks"
+	"github.com/DKhorkov/libs/pointers"
 
 	"github.com/DKhorkov/hmtm-notifications/internal/entities"
 	"github.com/DKhorkov/hmtm-notifications/internal/services"
@@ -23,10 +24,10 @@ var (
 )
 
 func TestEmailsService_GetUserEmailCommunications(t *testing.T) {
-	now := time.Now()
 	testCases := []struct {
 		name          string
 		userID        uint64
+		pagination    *entities.Pagination
 		setupMocks    func(emailsRepository *mockrepositories.MockEmailsRepository, logger *mocklogging.MockLogger)
 		expected      []entities.Email
 		errorExpected bool
@@ -34,6 +35,10 @@ func TestEmailsService_GetUserEmailCommunications(t *testing.T) {
 		{
 			name:   "get user email communications with existing email communications",
 			userID: userID,
+			pagination: &entities.Pagination{
+				Limit:  pointers.New[uint64](1),
+				Offset: pointers.New[uint64](1),
+			},
 			expected: []entities.Email{
 				{
 					ID:      1,
@@ -46,7 +51,14 @@ func TestEmailsService_GetUserEmailCommunications(t *testing.T) {
 			setupMocks: func(emailsRepository *mockrepositories.MockEmailsRepository, _ *mocklogging.MockLogger) {
 				emailsRepository.
 					EXPECT().
-					GetUserCommunications(gomock.Any(), userID).
+					GetUserCommunications(
+						gomock.Any(),
+						userID,
+						&entities.Pagination{
+							Limit:  pointers.New[uint64](1),
+							Offset: pointers.New[uint64](1),
+						},
+					).
 					Return(
 						[]entities.Email{
 							{
@@ -63,13 +75,24 @@ func TestEmailsService_GetUserEmailCommunications(t *testing.T) {
 			},
 		},
 		{
-			name:     "get user email communications without existing email communications",
-			userID:   userID,
+			name:   "get user email communications without existing email communications",
+			userID: userID,
+			pagination: &entities.Pagination{
+				Limit:  pointers.New[uint64](1),
+				Offset: pointers.New[uint64](1),
+			},
 			expected: []entities.Email{},
 			setupMocks: func(emailsRepository *mockrepositories.MockEmailsRepository, _ *mocklogging.MockLogger) {
 				emailsRepository.
 					EXPECT().
-					GetUserCommunications(gomock.Any(), userID).
+					GetUserCommunications(
+						gomock.Any(),
+						userID,
+						&entities.Pagination{
+							Limit:  pointers.New[uint64](1),
+							Offset: pointers.New[uint64](1),
+						},
+					).
 					Return([]entities.Email{}, nil).
 					Times(1)
 			},
@@ -77,10 +100,21 @@ func TestEmailsService_GetUserEmailCommunications(t *testing.T) {
 		{
 			name:   "get user email communications fail",
 			userID: userID,
+			pagination: &entities.Pagination{
+				Limit:  pointers.New[uint64](1),
+				Offset: pointers.New[uint64](1),
+			},
 			setupMocks: func(emailsRepository *mockrepositories.MockEmailsRepository, _ *mocklogging.MockLogger) {
 				emailsRepository.
 					EXPECT().
-					GetUserCommunications(gomock.Any(), userID).
+					GetUserCommunications(
+						gomock.Any(),
+						userID,
+						&entities.Pagination{
+							Limit:  pointers.New[uint64](1),
+							Offset: pointers.New[uint64](1),
+						},
+					).
 					Return(nil, errors.New("some error")).
 					Times(1)
 			},
@@ -100,7 +134,65 @@ func TestEmailsService_GetUserEmailCommunications(t *testing.T) {
 				tc.setupMocks(emailsRepository, logger)
 			}
 
-			actual, err := emailsService.GetUserCommunications(ctx, tc.userID)
+			actual, err := emailsService.GetUserCommunications(ctx, tc.userID, tc.pagination)
+			if tc.errorExpected {
+				require.Error(t, err)
+			} else {
+				require.NoError(t, err)
+			}
+
+			assert.Equal(t, tc.expected, actual)
+		})
+	}
+}
+
+func TestEmailsService_CountUserEmailCommunications(t *testing.T) {
+	testCases := []struct {
+		name          string
+		userID        uint64
+		setupMocks    func(emailsRepository *mockrepositories.MockEmailsRepository, logger *mocklogging.MockLogger)
+		expected      uint64
+		errorExpected bool
+	}{
+		{
+			name:     "success",
+			userID:   userID,
+			expected: 1,
+			setupMocks: func(emailsRepository *mockrepositories.MockEmailsRepository, _ *mocklogging.MockLogger) {
+				emailsRepository.
+					EXPECT().
+					CountUserCommunications(gomock.Any(), userID).
+					Return(uint64(1), nil).
+					Times(1)
+			},
+		},
+		{
+			name:   "error",
+			userID: userID,
+			setupMocks: func(emailsRepository *mockrepositories.MockEmailsRepository, _ *mocklogging.MockLogger) {
+				emailsRepository.
+					EXPECT().
+					CountUserCommunications(gomock.Any(), userID).
+					Return(uint64(0), errors.New("some error")).
+					Times(1)
+			},
+			errorExpected: true,
+		},
+	}
+
+	ctx := context.Background()
+	ctrl := gomock.NewController(t)
+	logger := mocklogging.NewMockLogger(ctrl)
+	emailsRepository := mockrepositories.NewMockEmailsRepository(ctrl)
+	emailsService := services.NewEmailsService(emailsRepository, logger)
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			if tc.setupMocks != nil {
+				tc.setupMocks(emailsRepository, logger)
+			}
+
+			actual, err := emailsService.CountUserCommunications(ctx, tc.userID)
 			if tc.errorExpected {
 				require.Error(t, err)
 			} else {
@@ -180,13 +272,13 @@ func TestEmailsService_SaveCommunication(t *testing.T) {
 				tc.setupMocks(emailsRepository)
 			}
 
-			emailID, err := emailsService.SaveCommunication(context.Background(), tc.email)
+			actual, err := emailsService.SaveCommunication(context.Background(), tc.email)
 			if tc.errorExpected {
 				require.Error(t, err)
 			} else {
 				require.NoError(t, err)
 			}
-			require.Equal(t, tc.expectedID, emailID)
+			require.Equal(t, tc.expectedID, actual)
 		})
 	}
 }

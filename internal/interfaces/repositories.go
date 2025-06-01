@@ -8,7 +8,8 @@ import (
 
 //go:generate mockgen -source=repositories.go -destination=../../mocks/repositories/emails_repository.go -exclude_interfaces=ToysRepository,SsoRepository,TicketsRepository -package=mockrepositories
 type EmailsRepository interface {
-	GetUserCommunications(ctx context.Context, userID uint64) ([]entities.Email, error)
+	GetUserCommunications(ctx context.Context, userID uint64, pagination *entities.Pagination) ([]entities.Email, error)
+	CountUserCommunications(ctx context.Context, userID uint64) (uint64, error)
 	SaveCommunication(ctx context.Context, email entities.Email) (communicationID uint64, err error)
 }
 
