@@ -1,0 +1,7 @@
+###
+
+grpcurl -proto api/protobuf/protofiles/notifications/emails.proto -plaintext -d '{"userID": 1, "pagination": {"limit": 2,"offset": 3}}' localhost:8040 emails.EmailsService.GetUserEmailCommunications
+
+###
+
+grpcurl -proto api/protobuf/protofiles/notifications/emails.proto -plaintext -d '{"userID": 1}' localhost:8040 emails.EmailsService.CountUserEmailCommunications

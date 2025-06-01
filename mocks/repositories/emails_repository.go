@@ -41,19 +41,34 @@ func (m *MockEmailsRepository) EXPECT() *MockEmailsRepositoryMockRecorder {
 	return m.recorder
 }
 
-// GetUserCommunications mocks base method.
-func (m *MockEmailsRepository) GetUserCommunications(ctx context.Context, userID uint64) ([]entities.Email, error) {
+// CountUserCommunications mocks base method.
+func (m *MockEmailsRepository) CountUserCommunications(ctx context.Context, userID uint64) (uint64, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetUserCommunications", ctx, userID)
+	ret := m.ctrl.Call(m, "CountUserCommunications", ctx, userID)
+	ret0, _ := ret[0].(uint64)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CountUserCommunications indicates an expected call of CountUserCommunications.
+func (mr *MockEmailsRepositoryMockRecorder) CountUserCommunications(ctx, userID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CountUserCommunications", reflect.TypeOf((*MockEmailsRepository)(nil).CountUserCommunications), ctx, userID)
+}
+
+// GetUserCommunications mocks base method.
+func (m *MockEmailsRepository) GetUserCommunications(ctx context.Context, userID uint64, pagination *entities.Pagination) ([]entities.Email, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetUserCommunications", ctx, userID, pagination)
 	ret0, _ := ret[0].([]entities.Email)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetUserCommunications indicates an expected call of GetUserCommunications.
-func (mr *MockEmailsRepositoryMockRecorder) GetUserCommunications(ctx, userID any) *gomock.Call {
+func (mr *MockEmailsRepositoryMockRecorder) GetUserCommunications(ctx, userID, pagination any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserCommunications", reflect.TypeOf((*MockEmailsRepository)(nil).GetUserCommunications), ctx, userID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserCommunications", reflect.TypeOf((*MockEmailsRepository)(nil).GetUserCommunications), ctx, userID, pagination)
 }
 
 // SaveCommunication mocks base method.

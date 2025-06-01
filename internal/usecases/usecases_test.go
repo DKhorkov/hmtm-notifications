@@ -3,6 +3,7 @@ package usecases
 import (
 	"context"
 	"errors"
+	"github.com/DKhorkov/libs/pointers"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -49,6 +50,7 @@ func TestUseCases_GetUserEmailCommunications(t *testing.T) {
 
 	testCases := []struct {
 		name       string
+		pagination *entities.Pagination
 		userID     uint64
 		setupMocks func(
 			emailsService *mockservices.MockEmailsService,
@@ -61,12 +63,16 @@ func TestUseCases_GetUserEmailCommunications(t *testing.T) {
 			ticketDeletedBuilder *mockcontentbuilders.MockTicketDeletedContentBuilder,
 			emailSender *mocksenders.MockEmailSender,
 		)
-		expectedEmails []entities.Email
-		errorExpected  bool
+		expected      []entities.Email
+		errorExpected bool
 	}{
 		{
 			name:   "success",
 			userID: 1,
+			pagination: &entities.Pagination{
+				Limit:  pointers.New[uint64](1),
+				Offset: pointers.New[uint64](1),
+			},
 			setupMocks: func(
 				emailsService *mockservices.MockEmailsService,
 				ssoService *mockservices.MockSsoService,
@@ -80,16 +86,27 @@ func TestUseCases_GetUserEmailCommunications(t *testing.T) {
 			) {
 				emailsService.
 					EXPECT().
-					GetUserCommunications(gomock.Any(), uint64(1)).
+					GetUserCommunications(
+						gomock.Any(),
+						uint64(1),
+						&entities.Pagination{
+							Limit:  pointers.New[uint64](1),
+							Offset: pointers.New[uint64](1),
+						},
+					).
 					Return([]entities.Email{{ID: 1, UserID: 1}}, nil).
 					Times(1)
 			},
-			expectedEmails: []entities.Email{{ID: 1, UserID: 1}},
-			errorExpected:  false,
+			expected:      []entities.Email{{ID: 1, UserID: 1}},
+			errorExpected: false,
 		},
 		{
 			name:   "error",
 			userID: 1,
+			pagination: &entities.Pagination{
+				Limit:  pointers.New[uint64](1),
+				Offset: pointers.New[uint64](1),
+			},
 			setupMocks: func(
 				emailsService *mockservices.MockEmailsService,
 				ssoService *mockservices.MockSsoService,
@@ -103,12 +120,19 @@ func TestUseCases_GetUserEmailCommunications(t *testing.T) {
 			) {
 				emailsService.
 					EXPECT().
-					GetUserCommunications(gomock.Any(), uint64(1)).
+					GetUserCommunications(
+						gomock.Any(),
+						uint64(1),
+						&entities.Pagination{
+							Limit:  pointers.New[uint64](1),
+							Offset: pointers.New[uint64](1),
+						},
+					).
 					Return(nil, errors.New("not found")).
 					Times(1)
 			},
-			expectedEmails: nil,
-			errorExpected:  true,
+			expected:      nil,
+			errorExpected: true,
 		},
 	}
 
@@ -128,12 +152,135 @@ func TestUseCases_GetUserEmailCommunications(t *testing.T) {
 				)
 			}
 
-			emails, err := useCases.GetUserEmailCommunications(context.Background(), tc.userID)
+			emails, err := useCases.GetUserEmailCommunications(context.Background(), tc.userID, tc.pagination)
 			if tc.errorExpected {
 				require.Error(t, err)
 			} else {
 				require.NoError(t, err)
-				require.Equal(t, tc.expectedEmails, emails)
+				require.Equal(t, tc.expected, emails)
+			}
+		})
+	}
+}
+
+func TestUseCases_CountUserEmailCommunications(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	emailsService := mockservices.NewMockEmailsService(ctrl)
+	ssoService := mockservices.NewMockSsoService(ctrl)
+	toysService := mockservices.NewMockToysService(ctrl)
+	ticketsService := mockservices.NewMockTicketsService(ctrl)
+	verifyEmailBuilder := mockcontentbuilders.NewMockVerifyEmailContentBuilder(ctrl)
+	forgetPasswordBuilder := mockcontentbuilders.NewMockForgetPasswordContentBuilder(ctrl)
+	ticketUpdatedBuilder := mockcontentbuilders.NewMockTicketUpdatedContentBuilder(ctrl)
+	ticketDeletedBuilder := mockcontentbuilders.NewMockTicketDeletedContentBuilder(ctrl)
+	emailSender := mocksenders.NewMockEmailSender(ctrl)
+
+	contentBuilders := interfaces.ContentBuilders{
+		VerifyEmail:    verifyEmailBuilder,
+		ForgetPassword: forgetPasswordBuilder,
+		TicketUpdated:  ticketUpdatedBuilder,
+		TicketDeleted:  ticketDeletedBuilder,
+	}
+	senders := interfaces.Senders{
+		Email: emailSender,
+	}
+
+	useCases := New(
+		emailsService,
+		ssoService,
+		toysService,
+		ticketsService,
+		contentBuilders,
+		senders,
+	)
+
+	testCases := []struct {
+		name       string
+		pagination *entities.Pagination
+		userID     uint64
+		setupMocks func(
+			emailsService *mockservices.MockEmailsService,
+			ssoService *mockservices.MockSsoService,
+			toysService *mockservices.MockToysService,
+			ticketsService *mockservices.MockTicketsService,
+			verifyEmailBuilder *mockcontentbuilders.MockVerifyEmailContentBuilder,
+			forgetPasswordBuilder *mockcontentbuilders.MockForgetPasswordContentBuilder,
+			ticketUpdatedBuilder *mockcontentbuilders.MockTicketUpdatedContentBuilder,
+			ticketDeletedBuilder *mockcontentbuilders.MockTicketDeletedContentBuilder,
+			emailSender *mocksenders.MockEmailSender,
+		)
+		expected      uint64
+		errorExpected bool
+	}{
+		{
+			name:   "success",
+			userID: 1,
+			setupMocks: func(
+				emailsService *mockservices.MockEmailsService,
+				ssoService *mockservices.MockSsoService,
+				toysService *mockservices.MockToysService,
+				ticketsService *mockservices.MockTicketsService,
+				verifyEmailBuilder *mockcontentbuilders.MockVerifyEmailContentBuilder,
+				forgetPasswordBuilder *mockcontentbuilders.MockForgetPasswordContentBuilder,
+				ticketUpdatedBuilder *mockcontentbuilders.MockTicketUpdatedContentBuilder,
+				ticketDeletedBuilder *mockcontentbuilders.MockTicketDeletedContentBuilder,
+				emailSender *mocksenders.MockEmailSender,
+			) {
+				emailsService.
+					EXPECT().
+					CountUserCommunications(gomock.Any(), uint64(1)).
+					Return(uint64(1), nil).
+					Times(1)
+			},
+			expected:      1,
+			errorExpected: false,
+		},
+		{
+			name:   "error",
+			userID: 1,
+			setupMocks: func(
+				emailsService *mockservices.MockEmailsService,
+				ssoService *mockservices.MockSsoService,
+				toysService *mockservices.MockToysService,
+				ticketsService *mockservices.MockTicketsService,
+				verifyEmailBuilder *mockcontentbuilders.MockVerifyEmailContentBuilder,
+				forgetPasswordBuilder *mockcontentbuilders.MockForgetPasswordContentBuilder,
+				ticketUpdatedBuilder *mockcontentbuilders.MockTicketUpdatedContentBuilder,
+				ticketDeletedBuilder *mockcontentbuilders.MockTicketDeletedContentBuilder,
+				emailSender *mocksenders.MockEmailSender,
+			) {
+				emailsService.
+					EXPECT().
+					CountUserCommunications(gomock.Any(), uint64(1)).
+					Return(uint64(0), errors.New("not found")).
+					Times(1)
+			},
+			errorExpected: true,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			if tc.setupMocks != nil {
+				tc.setupMocks(
+					emailsService,
+					ssoService,
+					toysService,
+					ticketsService,
+					verifyEmailBuilder,
+					forgetPasswordBuilder,
+					ticketUpdatedBuilder,
+					ticketDeletedBuilder,
+					emailSender,
+				)
+			}
+
+			actual, err := useCases.CountUserEmailCommunications(context.Background(), tc.userID)
+			if tc.errorExpected {
+				require.Error(t, err)
+			} else {
+				require.NoError(t, err)
+				require.Equal(t, tc.expected, actual)
 			}
 		})
 	}
@@ -184,7 +331,7 @@ func TestUseCases_SendVerifyEmailCommunication(t *testing.T) {
 			ticketDeletedBuilder *mockcontentbuilders.MockTicketDeletedContentBuilder,
 			emailSender *mocksenders.MockEmailSender,
 		)
-		expectedID    uint64
+		expected      uint64
 		errorExpected bool
 	}{
 		{
@@ -232,7 +379,7 @@ func TestUseCases_SendVerifyEmailCommunication(t *testing.T) {
 					Return(uint64(1), nil).
 					Times(1)
 			},
-			expectedID:    1,
+			expected:      1,
 			errorExpected: false,
 		},
 		{
@@ -255,7 +402,7 @@ func TestUseCases_SendVerifyEmailCommunication(t *testing.T) {
 					Return(nil, errors.New("not found")).
 					Times(1)
 			},
-			expectedID:    0,
+			expected:      0,
 			errorExpected: true,
 		},
 		{
@@ -297,7 +444,7 @@ func TestUseCases_SendVerifyEmailCommunication(t *testing.T) {
 					Return(errors.New("send failed")).
 					Times(1)
 			},
-			expectedID:    0,
+			expected:      0,
 			errorExpected: true,
 		},
 	}
@@ -318,12 +465,12 @@ func TestUseCases_SendVerifyEmailCommunication(t *testing.T) {
 				)
 			}
 
-			emailID, err := useCases.SendVerifyEmailCommunication(context.Background(), tc.userID)
+			actual, err := useCases.SendVerifyEmailCommunication(context.Background(), tc.userID)
 			if tc.errorExpected {
 				require.Error(t, err)
 			} else {
 				require.NoError(t, err)
-				require.Equal(t, tc.expectedID, emailID)
+				require.Equal(t, tc.expected, actual)
 			}
 		})
 	}
@@ -374,7 +521,7 @@ func TestUseCases_SendForgetPasswordEmailCommunication(t *testing.T) {
 			ticketDeletedBuilder *mockcontentbuilders.MockTicketDeletedContentBuilder,
 			emailSender *mocksenders.MockEmailSender,
 		)
-		expectedID    uint64
+		expected      uint64
 		errorExpected bool
 	}{
 		{
@@ -422,7 +569,7 @@ func TestUseCases_SendForgetPasswordEmailCommunication(t *testing.T) {
 					Return(uint64(1), nil).
 					Times(1)
 			},
-			expectedID:    1,
+			expected:      1,
 			errorExpected: false,
 		},
 		{
@@ -445,7 +592,7 @@ func TestUseCases_SendForgetPasswordEmailCommunication(t *testing.T) {
 					Return(nil, errors.New("not found")).
 					Times(1)
 			},
-			expectedID:    0,
+			expected:      0,
 			errorExpected: true,
 		}, {
 			name:   "send error",
@@ -486,7 +633,7 @@ func TestUseCases_SendForgetPasswordEmailCommunication(t *testing.T) {
 					Return(errors.New("send failed")).
 					Times(1)
 			},
-			expectedID:    0,
+			expected:      0,
 			errorExpected: true,
 		},
 	}
@@ -507,12 +654,12 @@ func TestUseCases_SendForgetPasswordEmailCommunication(t *testing.T) {
 				)
 			}
 
-			emailID, err := useCases.SendForgetPasswordEmailCommunication(context.Background(), tc.userID)
+			actual, err := useCases.SendForgetPasswordEmailCommunication(context.Background(), tc.userID)
 			if tc.errorExpected {
 				require.Error(t, err)
 			} else {
 				require.NoError(t, err)
-				require.Equal(t, tc.expectedID, emailID)
+				require.Equal(t, tc.expected, actual)
 			}
 		})
 	}
@@ -563,7 +710,7 @@ func TestUseCases_SendTicketUpdatedEmailCommunication(t *testing.T) {
 			ticketDeletedBuilder *mockcontentbuilders.MockTicketDeletedContentBuilder,
 			emailSender *mocksenders.MockEmailSender,
 		)
-		expectedIDs   []uint64
+		expected      []uint64
 		errorExpected bool
 	}{
 		{
@@ -632,7 +779,7 @@ func TestUseCases_SendTicketUpdatedEmailCommunication(t *testing.T) {
 					Return(uint64(1), nil).
 					Times(1)
 			},
-			expectedIDs:   []uint64{1},
+			expected:      []uint64{1},
 			errorExpected: false,
 		},
 		{
@@ -655,7 +802,7 @@ func TestUseCases_SendTicketUpdatedEmailCommunication(t *testing.T) {
 					Return(nil, errors.New("not found")).
 					Times(1)
 			},
-			expectedIDs:   nil,
+			expected:      nil,
 			errorExpected: true,
 		}, {
 			name:     "responds fetch error",
@@ -684,7 +831,7 @@ func TestUseCases_SendTicketUpdatedEmailCommunication(t *testing.T) {
 					Return(nil, errors.New("fetch failed")).
 					Times(1)
 			},
-			expectedIDs:   nil,
+			expected:      nil,
 			errorExpected: true,
 		},
 		{
@@ -721,7 +868,7 @@ func TestUseCases_SendTicketUpdatedEmailCommunication(t *testing.T) {
 					Return(nil, errors.New("not found")).
 					Times(1)
 			},
-			expectedIDs:   nil,
+			expected:      nil,
 			errorExpected: true,
 		},
 		{
@@ -765,7 +912,7 @@ func TestUseCases_SendTicketUpdatedEmailCommunication(t *testing.T) {
 					Return(nil, errors.New("not found")).
 					Times(1)
 			},
-			expectedIDs:   nil,
+			expected:      nil,
 			errorExpected: true,
 		},
 		{
@@ -828,7 +975,7 @@ func TestUseCases_SendTicketUpdatedEmailCommunication(t *testing.T) {
 					Return(errors.New("send failed")).
 					Times(1)
 			},
-			expectedIDs:   nil,
+			expected:      nil,
 			errorExpected: true,
 		},
 		{
@@ -897,7 +1044,7 @@ func TestUseCases_SendTicketUpdatedEmailCommunication(t *testing.T) {
 					Return(uint64(0), errors.New("save failed")).
 					Times(1)
 			},
-			expectedIDs:   nil,
+			expected:      nil,
 			errorExpected: true,
 		},
 	}
@@ -918,12 +1065,12 @@ func TestUseCases_SendTicketUpdatedEmailCommunication(t *testing.T) {
 				)
 			}
 
-			emailIDs, err := useCases.SendTicketUpdatedEmailCommunication(context.Background(), tc.ticketID)
+			actual, err := useCases.SendTicketUpdatedEmailCommunication(context.Background(), tc.ticketID)
 			if tc.errorExpected {
 				require.Error(t, err)
 			} else {
 				require.NoError(t, err)
-				require.Equal(t, tc.expectedIDs, emailIDs)
+				require.Equal(t, tc.expected, actual)
 			}
 		})
 	}
@@ -974,7 +1121,7 @@ func TestUseCases_SendTicketDeletedEmailCommunication(t *testing.T) {
 			ticketDeletedBuilder *mockcontentbuilders.MockTicketDeletedContentBuilder,
 			emailSender *mocksenders.MockEmailSender,
 		)
-		expectedIDs   []uint64
+		expected      []uint64
 		errorExpected bool
 	}{
 		{
@@ -1040,7 +1187,7 @@ func TestUseCases_SendTicketDeletedEmailCommunication(t *testing.T) {
 					Return(uint64(1), nil).
 					Times(1)
 			},
-			expectedIDs:   []uint64{1},
+			expected:      []uint64{1},
 			errorExpected: false,
 		},
 		{
@@ -1065,7 +1212,7 @@ func TestUseCases_SendTicketDeletedEmailCommunication(t *testing.T) {
 					Return(nil, errors.New("not found")).
 					Times(1)
 			},
-			expectedIDs:   nil,
+			expected:      nil,
 			errorExpected: true,
 		}, {
 			name: "master not found",
@@ -1097,7 +1244,7 @@ func TestUseCases_SendTicketDeletedEmailCommunication(t *testing.T) {
 					Return(nil, errors.New("not found")).
 					Times(1)
 			},
-			expectedIDs:   nil,
+			expected:      nil,
 			errorExpected: true,
 		},
 		{
@@ -1137,7 +1284,7 @@ func TestUseCases_SendTicketDeletedEmailCommunication(t *testing.T) {
 					Return(nil, errors.New("not found")).
 					Times(1)
 			},
-			expectedIDs:   nil,
+			expected:      nil,
 			errorExpected: true,
 		},
 		{
@@ -1197,7 +1344,7 @@ func TestUseCases_SendTicketDeletedEmailCommunication(t *testing.T) {
 					Return(errors.New("send failed")).
 					Times(1)
 			},
-			expectedIDs:   nil,
+			expected:      nil,
 			errorExpected: true,
 		},
 		{
@@ -1263,7 +1410,7 @@ func TestUseCases_SendTicketDeletedEmailCommunication(t *testing.T) {
 					Return(uint64(0), errors.New("save failed")).
 					Times(1)
 			},
-			expectedIDs:   nil,
+			expected:      nil,
 			errorExpected: true,
 		},
 	}
@@ -1284,12 +1431,12 @@ func TestUseCases_SendTicketDeletedEmailCommunication(t *testing.T) {
 				)
 			}
 
-			emailIDs, err := useCases.SendTicketDeletedEmailCommunication(context.Background(), tc.ticketData)
+			actual, err := useCases.SendTicketDeletedEmailCommunication(context.Background(), tc.ticketData)
 			if tc.errorExpected {
 				require.Error(t, err)
 			} else {
 				require.NoError(t, err)
-				require.Equal(t, tc.expectedIDs, emailIDs)
+				require.Equal(t, tc.expected, actual)
 			}
 		})
 	}

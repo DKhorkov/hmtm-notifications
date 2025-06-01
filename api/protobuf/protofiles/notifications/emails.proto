@@ -10,10 +10,17 @@ option go_package = "github.com/DKhorkov/hmtm-emails/api/protobuf/notifications;
 
 service EmailsService {
   rpc GetUserEmailCommunications(GetUserEmailCommunicationsIn) returns (GetUserEmailCommunicationsOut) {}
+  rpc CountUserEmailCommunications(CountUserEmailCommunicationsIn) returns (CountOut) {}
 }
 
 message GetUserEmailCommunicationsIn {
   uint64 userID = 1;
+  optional Pagination pagination = 2;
+}
+
+message Pagination {
+  optional uint64 limit = 1;
+  optional uint64 offset = 2;
 }
 
 message Email {
@@ -26,4 +33,12 @@ message Email {
 
 message GetUserEmailCommunicationsOut {
   repeated Email emails = 1;
+}
+
+message CountUserEmailCommunicationsIn {
+  uint64 userID = 1;
+}
+
+message CountOut {
+  uint64 count = 1;
 }

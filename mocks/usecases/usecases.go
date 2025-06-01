@@ -42,19 +42,34 @@ func (m *MockUseCases) EXPECT() *MockUseCasesMockRecorder {
 	return m.recorder
 }
 
-// GetUserEmailCommunications mocks base method.
-func (m *MockUseCases) GetUserEmailCommunications(ctx context.Context, userID uint64) ([]entities.Email, error) {
+// CountUserEmailCommunications mocks base method.
+func (m *MockUseCases) CountUserEmailCommunications(ctx context.Context, userID uint64) (uint64, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetUserEmailCommunications", ctx, userID)
+	ret := m.ctrl.Call(m, "CountUserEmailCommunications", ctx, userID)
+	ret0, _ := ret[0].(uint64)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CountUserEmailCommunications indicates an expected call of CountUserEmailCommunications.
+func (mr *MockUseCasesMockRecorder) CountUserEmailCommunications(ctx, userID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CountUserEmailCommunications", reflect.TypeOf((*MockUseCases)(nil).CountUserEmailCommunications), ctx, userID)
+}
+
+// GetUserEmailCommunications mocks base method.
+func (m *MockUseCases) GetUserEmailCommunications(ctx context.Context, userID uint64, pagination *entities.Pagination) ([]entities.Email, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetUserEmailCommunications", ctx, userID, pagination)
 	ret0, _ := ret[0].([]entities.Email)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetUserEmailCommunications indicates an expected call of GetUserEmailCommunications.
-func (mr *MockUseCasesMockRecorder) GetUserEmailCommunications(ctx, userID any) *gomock.Call {
+func (mr *MockUseCasesMockRecorder) GetUserEmailCommunications(ctx, userID, pagination any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserEmailCommunications", reflect.TypeOf((*MockUseCases)(nil).GetUserEmailCommunications), ctx, userID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserEmailCommunications", reflect.TypeOf((*MockUseCases)(nil).GetUserEmailCommunications), ctx, userID, pagination)
 }
 
 // SendForgetPasswordEmailCommunication mocks base method.

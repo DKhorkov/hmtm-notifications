@@ -16,6 +16,7 @@ import (
 
 const (
 	selectAllColumns       = "*"
+	selectCount            = "COUNT(*)"
 	emailsTableName        = "emails"
 	idColumnName           = "id"
 	userIDColumnName       = "user_id"
@@ -53,6 +54,7 @@ func NewEmailsRepository(
 func (repo *EmailsRepository) GetUserCommunications(
 	ctx context.Context,
 	userID uint64,
+	pagination *entities.Pagination,
 ) ([]entities.Email, error) {
 	ctx, span := repo.traceProvider.Span(ctx, tracing.CallerName(tracing.DefaultSkipLevel))
 	defer span.End()
@@ -67,13 +69,22 @@ func (repo *EmailsRepository) GetUserCommunications(
 
 	defer db.CloseConnectionContext(ctx, connection, repo.logger)
 
-	stmt, params, err := sq.
+	builder := sq.
 		Select(selectAllColumns).
 		From(emailsTableName).
 		Where(sq.Eq{userIDColumnName: userID}).
 		OrderBy(fmt.Sprintf("%s %s", idColumnName, DESC)).
-		PlaceholderFormat(sq.Dollar).
-		ToSql()
+		PlaceholderFormat(sq.Dollar)
+
+	if pagination != nil && pagination.Limit != nil {
+		builder = builder.Limit(*pagination.Limit)
+	}
+
+	if pagination != nil && pagination.Offset != nil {
+		builder = builder.Offset(*pagination.Offset)
+	}
+
+	stmt, params, err := builder.ToSql()
 	if err != nil {
 		return nil, err
 	}
@@ -121,6 +132,46 @@ func (repo *EmailsRepository) GetUserCommunications(
 	}
 
 	return emails, nil
+}
+
+func (repo *EmailsRepository) CountUserCommunications(
+	ctx context.Context,
+	userID uint64,
+) (uint64, error) {
+	ctx, span := repo.traceProvider.Span(ctx, tracing.CallerName(tracing.DefaultSkipLevel))
+	defer span.End()
+
+	span.AddEvent(repo.spanConfig.Events.Start.Name, repo.spanConfig.Events.Start.Opts...)
+	defer span.AddEvent(repo.spanConfig.Events.End.Name, repo.spanConfig.Events.End.Opts...)
+
+	connection, err := repo.dbConnector.Connection(ctx)
+	if err != nil {
+		return 0, err
+	}
+
+	defer db.CloseConnectionContext(ctx, connection, repo.logger)
+
+	builder := sq.
+		Select(selectCount).
+		From(emailsTableName).
+		Where(sq.Eq{userIDColumnName: userID}).
+		PlaceholderFormat(sq.Dollar)
+
+	stmt, params, err := builder.ToSql()
+	if err != nil {
+		return 0, err
+	}
+
+	// Using mutex for concurrent-safety purpose of using via workers:
+	repo.mutex.RLock()
+	defer repo.mutex.RUnlock()
+
+	var count uint64
+	if err = connection.QueryRowContext(ctx, stmt, params...).Scan(&count); err != nil {
+		return 0, err
+	}
+
+	return count, nil
 }
 
 func (repo *EmailsRepository) SaveCommunication(
