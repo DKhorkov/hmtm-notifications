@@ -60,8 +60,8 @@ func (api ServerAPI) GetUserEmailCommunications(
 	var pagination *entities.Pagination
 	if in.GetPagination() != nil {
 		pagination = &entities.Pagination{
-			Limit:  in.GetPagination().Limit,
-			Offset: in.GetPagination().Offset,
+			Limit:  in.Pagination.Limit,
+			Offset: in.Pagination.Offset,
 		}
 	}
 
